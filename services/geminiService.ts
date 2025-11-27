@@ -3,8 +3,6 @@ import { DocumentType, FormData } from '../types';
 import { PROMPT_TEMPLATES, SYSTEM_INSTRUCTION } from '../constants';
 
 // Initialize the API client
-// Note: In a production environment, this should be handled securely.
-// Using process.env.API_KEY as per instructions.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateDocumentStream = async (
@@ -12,23 +10,39 @@ export const generateDocumentStream = async (
   data: FormData,
   onChunk: (text: string) => void
 ) => {
-  const modelId = 'gemini-2.5-flash'; 
+  // Utilizamos o Gemini 1.5 Pro (ou 3-Pro Preview) que possui a maior janela de contexto de saída
+  // para garantir que documentos longos como editais não sejam cortados.
+  const modelId = 'gemini-3-pro-preview'; 
 
   const userPrompt = `
-    INFORMAÇÕES DO PROCESSO:
-    Órgão Público: ${data.organName}
-    Cidade/Estado: ${data.city}
-    Modalidade da Licitação: ${data.modality}
-    Critério de Julgamento: ${data.judgmentCriteria}
-    Objeto da Licitação: ${data.objectDescription}
-    Justificativa: ${data.justification}
-    Valor Estimado: ${data.estimatedValue}
-    Informações Adicionais: ${data.additionalInfo}
+    ATENÇÃO MÁXIMA: GERAÇÃO DE DOCUMENTO JURÍDICO OFICIAL.
+    
+    PERFIL DO REDATOR: Auditor Federal de Controle Externo e Especialista em Licitações.
+    MISSÃO: Produzir um documento à prova de falhas, auditável e tecnicamente perfeito.
+    
+    DADOS DO PROCESSO ADMINISTRATIVO:
+    -----------------------------------
+    ÓRGÃO: ${data.organName}
+    LOCAL: ${data.city}
+    OBJETO DA CONTRATAÇÃO: ${data.objectDescription}
+    VALOR ESTIMADO: ${data.estimatedValue}
+    MODALIDADE: ${data.modality}
+    CRITÉRIO DE JULGAMENTO: ${data.judgmentCriteria}
+    JUSTIFICATIVA: ${data.justification}
+    OBSERVAÇÕES: ${data.additionalInfo}
+    -----------------------------------
 
-    TAREFA:
+    DOCUMENTO A SER GERADO: ${docType}
+    
+    INSTRUÇÕES ESTRUTURAIS ESPECÍFICAS:
     ${PROMPT_TEMPLATES[docType]}
 
-    Gere o conteúdo em formato Markdown bem estruturado. Use títulos (##), listas e negrito para destacar seções importantes.
+    REGRAS DE FORMATAÇÃO E ESTILO:
+    1. Use Markdown profissional.
+    2. CITE A LEI: Sempre que afirmar uma obrigação ou direito, coloque "(conforme Art. X, Lei 14.133/21)".
+    3. NÃO RESUMA: Escreva todas as cláusulas por extenso.
+    4. Use linguagem clara, direta, mas formal.
+    5. Destaque prazos, valores e obrigações críticas em **negrito**.
   `;
 
   try {
@@ -42,8 +56,10 @@ export const generateDocumentStream = async (
       ],
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
-        temperature: 0.4, // Lower temperature for more consistent/legal output
-        maxOutputTokens: 8192, // High limit for long legal documents
+        temperature: 0.2, // Baixa temperatura para reduzir alucinações e aumentar a precisão legal
+        maxOutputTokens: 65536, // Limite máximo
+        topP: 0.95,
+        topK: 40,
       }
     });
 

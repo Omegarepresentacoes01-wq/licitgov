@@ -2,14 +2,23 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { InputForm } from './components/InputForm';
 import { ResultViewer } from './components/ResultViewer';
-import { DocumentType, FormData, GenerationState } from './types';
+import { LoginPage } from './components/LoginPage';
+import { AdminDashboard } from './components/AdminDashboard';
+import { DocumentType, FormData, GenerationState, User } from './types';
 import { generateDocumentStream } from './services/geminiService';
+import { getCurrentUser, logout, saveDocument } from './services/mockBackend';
 
 const App: React.FC = () => {
+  // Authentication & Routing State
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [view, setView] = useState<'login' | 'app' | 'admin'>('login');
+  
+  // App State
   const [selectedDoc, setSelectedDoc] = useState<DocumentType>(DocumentType.ETP);
   const [outputContent, setOutputContent] = useState<string>('');
+  const [fullGeneratedText, setFullGeneratedText] = useState<string>(''); // To save later
   
-  // Theme state initialization
+  // Theme state
   const [darkMode, setDarkMode] = useState(() => {
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return true;
@@ -17,7 +26,6 @@ const App: React.FC = () => {
     return false;
   });
 
-  // Apply theme class to document
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
@@ -25,6 +33,15 @@ const App: React.FC = () => {
       document.documentElement.classList.remove('dark');
     }
   }, [darkMode]);
+
+  // Check auth on mount
+  useEffect(() => {
+    const user = getCurrentUser();
+    if (user) {
+      setCurrentUser(user);
+      setView('app');
+    }
+  }, []);
 
   const [formData, setFormData] = useState<FormData>({
     organName: '',
@@ -45,6 +62,7 @@ const App: React.FC = () => {
   const handleDocumentSelect = (doc: DocumentType) => {
     setSelectedDoc(doc);
     setOutputContent(''); 
+    setFullGeneratedText('');
     setGenState({ isGenerating: false, error: null });
   };
 
@@ -53,19 +71,61 @@ const App: React.FC = () => {
 
     setGenState({ isGenerating: true, error: null });
     setOutputContent(''); 
+    let accumulatedText = '';
 
     try {
       await generateDocumentStream(selectedDoc, formData, (chunk) => {
+        accumulatedText += chunk;
         setOutputContent(prev => prev + chunk);
       });
+      
+      setFullGeneratedText(accumulatedText);
+
+      // Auto-save the document to the user's SaaS account
+      if (currentUser) {
+        saveDocument({
+            userId: currentUser.id,
+            type: selectedDoc,
+            title: `${selectedDoc.split(' (')[0]} - ${formData.objectDescription.substring(0, 30)}...`,
+            content: accumulatedText,
+            preview: accumulatedText.substring(0, 150)
+        });
+      }
+
     } catch (error) {
       console.error(error);
       setGenState(prev => ({ ...prev, error: "Erro ao gerar o documento. Verifique sua chave de API ou tente novamente." }));
     } finally {
       setGenState(prev => ({ ...prev, isGenerating: false }));
     }
-  }, [selectedDoc, formData]);
+  }, [selectedDoc, formData, currentUser]);
 
+  const handleLoginSuccess = (user: User) => {
+    setCurrentUser(user);
+    // If admin, redirect to admin dash first? No, let's go to app and offer dash link.
+    setView('app');
+  };
+
+  const handleLogout = () => {
+    logout();
+    setCurrentUser(null);
+    setView('login');
+    // Reset forms
+    setOutputContent('');
+    setFormData({ ...formData, objectDescription: '', estimatedValue: '', justification: '' });
+  };
+
+  // --- RENDER VIEWS ---
+
+  if (view === 'login') {
+    return <LoginPage onLoginSuccess={handleLoginSuccess} />;
+  }
+
+  if (view === 'admin' && currentUser?.role === 'admin') {
+    return <AdminDashboard currentUser={currentUser} onExit={() => setView('app')} />;
+  }
+
+  // MAIN APP VIEW
   return (
     <div className="flex h-screen w-full overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
       <Sidebar 
@@ -74,6 +134,9 @@ const App: React.FC = () => {
         isGenerating={genState.isGenerating}
         darkMode={darkMode}
         toggleDarkMode={() => setDarkMode(!darkMode)}
+        currentUser={currentUser}
+        onLogout={handleLogout}
+        onAdminClick={() => setView('admin')}
       />
       
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
@@ -85,7 +148,7 @@ const App: React.FC = () => {
             <h2 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
               {selectedDoc}
             </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Preencha os dados para gerar o documento jurídico completo</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Ambiente seguro | Seus dados estão isolados</p>
           </div>
           
           {genState.error && (

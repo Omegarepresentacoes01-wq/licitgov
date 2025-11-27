@@ -4,7 +4,6 @@ export enum DocumentType {
   TR = 'Termo de Referência',
   PESQUISA_PRECO = 'Modelo de Pesquisa de Preço',
   VIABILIDADE = 'Estudo de Viabilidade',
-  EDITAL = 'Edital Completo (Lei 14.133)',
 }
 
 export interface FormData {
@@ -26,4 +25,28 @@ export interface Message {
 export interface GenerationState {
   isGenerating: boolean;
   error: string | null;
+}
+
+// --- SAAS TYPES ---
+
+export type UserRole = 'admin' | 'user';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  organization?: string;
+  createdAt: string;
+  active: boolean;
+}
+
+export interface SavedDocument {
+  id: string;
+  userId: string;
+  type: DocumentType;
+  title: string;
+  content: string;
+  createdAt: string;
+  preview: string;
 }

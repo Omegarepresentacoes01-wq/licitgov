@@ -110,10 +110,22 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ content, isGeneratin
     <div className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 overflow-hidden relative transition-colors duration-300">
       <div className="bg-white dark:bg-slate-900 p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center shrink-0">
         <h3 className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          {isGenerating ? (
+             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          ) : (
+             <span className="w-2 h-2 rounded-full bg-slate-400"></span>
+          )}
           Resultado Gerado
         </h3>
         <div className="flex gap-2">
+            {!isGenerating && content.length > 50 && (
+                <span className="text-xs text-green-600 flex items-center gap-1 bg-green-50 px-2 py-1 rounded-md animate-fadeIn">
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Salvo no Histórico
+                </span>
+            )}
             <button 
                 onClick={handleCopy}
                 disabled={!content}
@@ -144,7 +156,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ content, isGeneratin
             {isGenerating && (
                 <div className="flex items-center gap-2 mt-6 text-primary-600 dark:text-primary-400 animate-pulse">
                     <span className="h-2 w-2 bg-primary-500 rounded-full"></span>
-                    <span className="text-sm font-medium">A IA está redigindo o documento...</span>
+                    <span className="text-sm font-medium">A IA está redigindo o documento e salvando em sua conta...</span>
                 </div>
             )}
             <div ref={bottomRef} />

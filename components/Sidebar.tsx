@@ -1,5 +1,5 @@
 import React from 'react';
-import { DocumentType } from '../types';
+import { DocumentType, User } from '../types';
 
 interface SidebarProps {
   selectedDoc: DocumentType;
@@ -7,9 +7,11 @@ interface SidebarProps {
   isGenerating: boolean;
   darkMode: boolean;
   toggleDarkMode: () => void;
+  currentUser: User | null;
+  onLogout: () => void;
+  onAdminClick: () => void;
 }
 
-// Simple Icon Components for cleaner look
 const DocIcon = () => (
   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -34,12 +36,6 @@ const AlertIcon = () => (
   </svg>
 );
 
-const SearchIcon = () => (
-  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-  </svg>
-);
-
 const MoneyIcon = () => (
   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -52,10 +48,9 @@ const docIcons: Record<DocumentType, React.ReactNode> = {
   [DocumentType.TR]: <DocIcon />,
   [DocumentType.PESQUISA_PRECO]: <MoneyIcon />,
   [DocumentType.VIABILIDADE]: <ChartIcon />,
-  [DocumentType.EDITAL]: <ScaleIcon />,
 };
 
-export const Sidebar: React.FC<SidebarProps> = ({ selectedDoc, onSelect, isGenerating, darkMode, toggleDarkMode }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ selectedDoc, onSelect, isGenerating, darkMode, toggleDarkMode, currentUser, onLogout, onAdminClick }) => {
   return (
     <aside className="w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col h-full z-20 shrink-0 transition-colors duration-300">
       <div className="p-6">
@@ -67,13 +62,44 @@ export const Sidebar: React.FC<SidebarProps> = ({ selectedDoc, onSelect, isGener
             <h1 className="text-xl font-bold text-slate-900 dark:text-white leading-none">
               LicitGov AI
             </h1>
-            <p className="text-xs text-primary-600 dark:text-primary-400 font-medium mt-1">Assistente Jurídico 14.133</p>
+            <p className="text-xs text-primary-600 dark:text-primary-400 font-medium mt-1">SaaS Jurídico</p>
           </div>
         </div>
       </div>
       
+      {/* User Profile Card */}
+      {currentUser && (
+        <div className="px-4 mb-6">
+            <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+                <div className="flex items-center gap-3 mb-2">
+                    <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 flex items-center justify-center font-bold text-xs">
+                        {currentUser.name.charAt(0)}
+                    </div>
+                    <div className="overflow-hidden">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{currentUser.name}</p>
+                        <p className="text-xs text-slate-500 truncate">{currentUser.organization}</p>
+                    </div>
+                </div>
+                {currentUser.role === 'admin' && (
+                    <button 
+                        onClick={onAdminClick}
+                        className="w-full text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 py-1 rounded-md font-medium hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors mb-2"
+                    >
+                        Painel Admin
+                    </button>
+                )}
+                <button 
+                    onClick={onLogout}
+                    className="w-full text-xs flex items-center justify-center gap-1 text-slate-500 hover:text-red-500 transition-colors"
+                >
+                    Sair da conta
+                </button>
+            </div>
+        </div>
+      )}
+
       <div className="px-4 mb-2">
-        <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 px-2">Documentos</p>
+        <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 px-2">Gerar Novo</p>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 space-y-1">
@@ -121,7 +147,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ selectedDoc, onSelect, isGener
         </button>
         
         <div className="mt-4 text-xs text-center text-slate-400 dark:text-slate-600">
-          Powered by Gemini 2.5 Flash
+          LicitGov SaaS v1.0
         </div>
       </div>
     </aside>
