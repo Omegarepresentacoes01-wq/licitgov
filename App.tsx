@@ -8,7 +8,62 @@ import { DocumentType, FormData, GenerationState, User } from './types';
 import { generateDocumentStream } from './services/geminiService';
 import { getCurrentUser, logout, saveDocument } from './services/mockBackend';
 
-const App: React.FC = () => {
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+// Error Boundary para evitar tela branca completa em produção
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error("Uncaught error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-4 font-sans text-slate-800 dark:text-white">
+          <div className="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl max-w-lg w-full border border-red-100 dark:border-red-900/30">
+            <div className="w-16 h-16 bg-red-100 dark:bg-red-900/50 rounded-full flex items-center justify-center mb-6 mx-auto">
+                <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-center mb-2">Ops! Algo deu errado.</h1>
+            <p className="text-center text-slate-600 dark:text-slate-400 mb-6">
+                Ocorreu um erro inesperado na aplicação. Isso geralmente ocorre por configuração de ambiente incompleta.
+            </p>
+            <div className="bg-slate-100 dark:bg-slate-950 p-4 rounded-lg text-xs font-mono overflow-auto mb-6 border border-slate-200 dark:border-slate-800 max-h-40">
+              {this.state.error?.toString()}
+            </div>
+            <button 
+              onClick={() => window.location.reload()}
+              className="w-full py-3 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/30"
+            >
+              Recarregar Página
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+const AppContent: React.FC = () => {
   // Authentication & Routing State
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [view, setView] = useState<'login' | 'app' | 'admin'>('login');
@@ -20,7 +75,8 @@ const App: React.FC = () => {
   
   // Theme state
   const [darkMode, setDarkMode] = useState(() => {
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    // Check window existence for SSR safety
+    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return true;
     }
     return false;
@@ -98,8 +154,8 @@ const App: React.FC = () => {
     } catch (error: any) {
       console.error(error);
       let errorMessage = "Erro ao gerar o documento.";
-      if (error.message && error.message.includes('API_KEY')) {
-        errorMessage = "Chave de API inválida ou não configurada.";
+      if (error.message && (error.message.includes('API_KEY') || error.message.includes('API Key'))) {
+        errorMessage = "Chave de API não configurada corretamente (VITE_API_KEY).";
       } else if (error.message) {
         errorMessage = `Erro: ${error.message}`;
       }
@@ -194,6 +250,14 @@ const App: React.FC = () => {
         </div>
       </main>
     </div>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <ErrorBoundary>
+      <AppContent />
+    </ErrorBoundary>
   );
 };
 

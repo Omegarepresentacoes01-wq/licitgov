@@ -5,10 +5,10 @@ interface StoredUser extends User {
   password?: string;
 }
 
-// Chaves do LocalStorage - V2 para forçar limpeza de cache anterior
-const USERS_KEY = 'licitgov_users_prod_v2';
-const DOCS_KEY = 'licitgov_documents_prod_v2';
-const CURRENT_USER_KEY = 'licitgov_current_user_prod_v2';
+// Chaves do LocalStorage - V3 para produção real
+const USERS_KEY = 'licitgov_users_prod_v3';
+const DOCS_KEY = 'licitgov_documents_prod_v3';
+const CURRENT_USER_KEY = 'licitgov_current_user_prod_v3';
 
 // Dados Iniciais (Seed)
 const INITIAL_ADMIN: StoredUser = {
@@ -24,6 +24,9 @@ const INITIAL_ADMIN: StoredUser = {
 
 // Inicializa o "Banco de Dados" e GARANTE acesso ao Admin
 const initDB = () => {
+  // SEGURANÇA: Verificar se estamos no navegador para evitar erro no build (SSR/Node)
+  if (typeof window === 'undefined') return;
+
   let users: StoredUser[] = [];
   const existingData = localStorage.getItem(USERS_KEY);
 
@@ -51,11 +54,13 @@ const initDB = () => {
     localStorage.setItem(DOCS_KEY, JSON.stringify([]));
   }
   
-  console.log("Sistema inicializado. Admin restaurado: admin@licitgov.com / admin123");
+  console.log("Sistema inicializado. Admin verificado.");
 };
 
-// Executa a correção imediatamente ao carregar o arquivo
-initDB();
+// Executa a correção apenas se estiver no navegador
+if (typeof window !== 'undefined') {
+  initDB();
+}
 
 // --- AUTH SERVICES ---
 
@@ -64,6 +69,11 @@ export const login = (email: string, password: string): Promise<User> => {
     // Simulação de delay de rede
     setTimeout(() => {
       try {
+        if (typeof window === 'undefined') {
+            reject(new Error('Ambiente inválido.'));
+            return;
+        }
+
         // Recarregar do storage para garantir dados frescos
         const users: StoredUser[] = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
         
@@ -107,10 +117,13 @@ export const login = (email: string, password: string): Promise<User> => {
 };
 
 export const logout = () => {
-  localStorage.removeItem(CURRENT_USER_KEY);
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(CURRENT_USER_KEY);
+  }
 };
 
 export const getCurrentUser = (): User | null => {
+  if (typeof window === 'undefined') return null;
   try {
       const userStr = localStorage.getItem(CURRENT_USER_KEY);
       return userStr ? JSON.parse(userStr) : null;
@@ -122,11 +135,13 @@ export const getCurrentUser = (): User | null => {
 // --- USER MANAGEMENT (ADMIN ONLY) ---
 
 export const getAllUsers = (): User[] => {
+  if (typeof window === 'undefined') return [];
   const users: StoredUser[] = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
   return users.map(({ password, ...u }) => u);
 };
 
 export const createUser = (user: Omit<User, 'id' | 'createdAt'>, password: string): User => {
+  if (typeof window === 'undefined') throw new Error('Ambiente inválido');
   const users: StoredUser[] = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
   
   if (users.find(u => u.email.toLowerCase() === user.email.toLowerCase())) {
@@ -148,6 +163,7 @@ export const createUser = (user: Omit<User, 'id' | 'createdAt'>, password: strin
 };
 
 export const toggleUserStatus = (userId: string): User[] => {
+  if (typeof window === 'undefined') return [];
   const users: StoredUser[] = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
   const updatedUsers = users.map(u => {
     if (u.id === userId && u.role !== 'admin') { 
@@ -160,6 +176,7 @@ export const toggleUserStatus = (userId: string): User[] => {
 };
 
 export const deleteUser = (userId: string): User[] => {
+    if (typeof window === 'undefined') return [];
     let users: StoredUser[] = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
     const user = users.find(u => u.id === userId);
     
@@ -175,6 +192,7 @@ export const deleteUser = (userId: string): User[] => {
 // --- DOCUMENT MANAGEMENT (USER ISOLATED) ---
 
 export const saveDocument = (doc: Omit<SavedDocument, 'id' | 'createdAt'>): SavedDocument => {
+  if (typeof window === 'undefined') throw new Error('Ambiente inválido');
   const docs: SavedDocument[] = JSON.parse(localStorage.getItem(DOCS_KEY) || '[]');
   
   const newDoc: SavedDocument = {
@@ -189,6 +207,7 @@ export const saveDocument = (doc: Omit<SavedDocument, 'id' | 'createdAt'>): Save
 };
 
 export const getDocumentsByUser = (userId: string): SavedDocument[] => {
+  if (typeof window === 'undefined') return [];
   const docs: SavedDocument[] = JSON.parse(localStorage.getItem(DOCS_KEY) || '[]');
   return docs.filter(d => d.userId === userId).sort((a, b) => 
     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -196,12 +215,14 @@ export const getDocumentsByUser = (userId: string): SavedDocument[] => {
 };
 
 export const getAllDocumentsCount = (): number => {
+    if (typeof window === 'undefined') return 0;
     const docs: SavedDocument[] = JSON.parse(localStorage.getItem(DOCS_KEY) || '[]');
     return docs.length;
 }
 
 // FUNÇÃO DE EMERGÊNCIA
 export const hardReset = () => {
+    if (typeof window === 'undefined') return;
     localStorage.removeItem(USERS_KEY);
     localStorage.removeItem(DOCS_KEY);
     localStorage.removeItem(CURRENT_USER_KEY);
