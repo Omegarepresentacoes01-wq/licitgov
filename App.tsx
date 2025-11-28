@@ -67,7 +67,10 @@ const App: React.FC = () => {
   };
 
   const handleGenerate = useCallback(async () => {
-    if (!formData.objectDescription) return;
+    if (!formData.objectDescription) {
+        alert("Por favor, preencha a descrição do objeto antes de gerar.");
+        return;
+    }
 
     setGenState({ isGenerating: true, error: null });
     setOutputContent(''); 
@@ -82,7 +85,7 @@ const App: React.FC = () => {
       setFullGeneratedText(accumulatedText);
 
       // Auto-save the document to the user's SaaS account
-      if (currentUser) {
+      if (currentUser && accumulatedText.length > 50) {
         saveDocument({
             userId: currentUser.id,
             type: selectedDoc,
@@ -92,9 +95,15 @@ const App: React.FC = () => {
         });
       }
 
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      setGenState(prev => ({ ...prev, error: "Erro ao gerar o documento. Verifique sua chave de API ou tente novamente." }));
+      let errorMessage = "Erro ao gerar o documento.";
+      if (error.message && error.message.includes('API_KEY')) {
+        errorMessage = "Chave de API inválida ou não configurada.";
+      } else if (error.message) {
+        errorMessage = `Erro: ${error.message}`;
+      }
+      setGenState(prev => ({ ...prev, error: errorMessage }));
     } finally {
       setGenState(prev => ({ ...prev, isGenerating: false }));
     }
@@ -152,9 +161,14 @@ const App: React.FC = () => {
           </div>
           
           {genState.error && (
-            <span className="animate-pulse text-red-600 dark:text-red-400 text-sm font-medium bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded-full border border-red-200 dark:border-red-800 shadow-sm">
-              {genState.error}
-            </span>
+            <div className="animate-fadeIn bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg px-4 py-2 flex items-center gap-2">
+                <svg className="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-sm font-medium text-red-700 dark:text-red-300">
+                  {genState.error}
+                </span>
+            </div>
           )}
         </header>
 

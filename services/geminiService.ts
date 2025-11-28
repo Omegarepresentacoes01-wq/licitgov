@@ -10,8 +10,7 @@ export const generateDocumentStream = async (
   data: FormData,
   onChunk: (text: string) => void
 ) => {
-  // Utilizamos o Gemini 1.5 Pro (ou 3-Pro Preview) que possui a maior janela de contexto de saída
-  // para garantir que documentos longos como editais não sejam cortados.
+  // Utilizamos o modelo adequado para tarefas complexas
   const modelId = 'gemini-3-pro-preview'; 
 
   const userPrompt = `
@@ -56,8 +55,8 @@ export const generateDocumentStream = async (
       ],
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
-        temperature: 0.2, // Baixa temperatura para reduzir alucinações e aumentar a precisão legal
-        maxOutputTokens: 65536, // Limite máximo
+        temperature: 0.4, // Equilíbrio entre criatividade e rigor
+        maxOutputTokens: 8192, // Limite seguro para garantir que a API responda sem erro 400
         topP: 0.95,
         topK: 40,
       }

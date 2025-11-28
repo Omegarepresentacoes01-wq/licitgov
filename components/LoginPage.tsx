@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { login } from '../services/mockBackend';
+import { login, hardReset } from '../services/mockBackend';
 import { User } from '../types';
 
 interface LoginPageProps {
@@ -75,7 +75,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           </div>
 
           {error && (
-            <div className="text-red-500 text-sm text-center bg-red-50 dark:bg-red-900/20 py-2 rounded-lg">
+            <div className="text-red-500 text-sm text-center bg-red-50 dark:bg-red-900/20 py-2 rounded-lg border border-red-100 dark:border-red-900/30">
               {error}
             </div>
           )}
@@ -95,6 +95,18 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             </button>
           </div>
         </form>
+
+        <div className="pt-6">
+            <div className="text-center">
+                <button 
+                    onClick={hardReset}
+                    type="button"
+                    className="text-xs text-slate-400 hover:text-slate-600 dark:text-slate-600 dark:hover:text-slate-400 transition-colors"
+                >
+                    Recuperar Acesso
+                </button>
+            </div>
+        </div>
       </div>
     </div>
   );
