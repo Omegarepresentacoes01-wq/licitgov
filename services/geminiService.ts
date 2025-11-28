@@ -2,22 +2,14 @@ import { GoogleGenAI } from "@google/genai";
 import { DocumentType, FormData } from '../types';
 import { PROMPT_TEMPLATES, SYSTEM_INSTRUCTION } from '../constants';
 
-// ROBUST API KEY RETRIEVAL - Simplified to enforce process.env.API_KEY
-const apiKey = process.env.API_KEY || '';
-const ai = new GoogleGenAI({ apiKey });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateDocumentStream = async (
   docType: DocumentType,
   data: FormData,
   onChunk: (text: string) => void
 ) => {
-  // Validação em tempo de execução para dar feedback claro ao usuário
-  if (!apiKey) {
-    throw new Error('ERRO DE CONFIGURAÇÃO: Chave de API não encontrada. Certifique-se de que a variável de ambiente API_KEY está configurada.');
-  }
-
-  // Utilizamos o modelo adequado para tarefas complexas
-  const modelId = 'gemini-3-pro-preview'; 
+  const modelId = 'gemini-3-pro-preview';
 
   const userPrompt = `
     ATENÇÃO MÁXIMA: GERAÇÃO DE DOCUMENTO JURÍDICO OFICIAL.
@@ -53,16 +45,10 @@ export const generateDocumentStream = async (
   try {
     const response = await ai.models.generateContentStream({
       model: modelId,
-      contents: [
-        {
-          role: 'user',
-          parts: [{ text: userPrompt }]
-        }
-      ],
+      contents: userPrompt,
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
-        temperature: 0.4, // Equilíbrio entre criatividade e rigor
-        maxOutputTokens: 8192, // Limite seguro para garantir que a API responda sem erro 400
+        temperature: 0.4,
         topP: 0.95,
         topK: 40,
       }
