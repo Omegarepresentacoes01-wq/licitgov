@@ -2,11 +2,8 @@ import { GoogleGenAI } from "@google/genai";
 import { DocumentType, FormData } from '../types';
 import { PROMPT_TEMPLATES, SYSTEM_INSTRUCTION } from '../constants';
 
-// SAFE INITIALIZATION for Vite/Vercel
-// O Vite expõe variáveis de ambiente via import.meta.env com o prefixo VITE_
-// Usamos um cast 'any' para evitar erros de TS se o setup do usuário não tiver os types do Vite configurados.
-// O fallback para string vazia '' previne que a aplicação quebre (White Screen) na inicialização se a chave não estiver configurada.
-const apiKey = (import.meta as any).env?.VITE_API_KEY || ''; 
+// ROBUST API KEY RETRIEVAL - Simplified to enforce process.env.API_KEY
+const apiKey = process.env.API_KEY || '';
 const ai = new GoogleGenAI({ apiKey });
 
 export const generateDocumentStream = async (
@@ -16,7 +13,7 @@ export const generateDocumentStream = async (
 ) => {
   // Validação em tempo de execução para dar feedback claro ao usuário
   if (!apiKey) {
-    throw new Error('CONFIGURAÇÃO NECESSÁRIA: A Chave de API (VITE_API_KEY) não foi detectada. Configure a variável de ambiente VITE_API_KEY no painel da Vercel/Netlify ou no seu arquivo .env local.');
+    throw new Error('ERRO DE CONFIGURAÇÃO: Chave de API não encontrada. Certifique-se de que a variável de ambiente API_KEY está configurada.');
   }
 
   // Utilizamos o modelo adequado para tarefas complexas

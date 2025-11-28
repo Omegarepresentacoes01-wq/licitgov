@@ -62,13 +62,13 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
     <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 h-full flex flex-col overflow-hidden transition-all duration-300">
       
       {/* Wizard Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 p-6">
-        <div className="flex justify-between items-end mb-6">
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 p-4 lg:p-6 shrink-0">
+        <div className="flex justify-between items-end mb-4 lg:mb-6">
           <div>
-            <h2 className="text-xl font-bold text-slate-800 dark:text-white">
+            <h2 className="text-lg lg:text-xl font-bold text-slate-800 dark:text-white">
               {STEPS[currentStep - 1].title}
             </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            <p className="text-xs lg:text-sm text-slate-500 dark:text-slate-400 mt-1">
               {STEPS[currentStep - 1].description}
             </p>
           </div>
@@ -91,7 +91,7 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
                 className={`relative z-10 flex flex-col items-center justify-center transition-all duration-300`}
               >
                 <div 
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all duration-300
+                  className={`w-6 h-6 lg:w-8 lg:h-8 rounded-full flex items-center justify-center text-[10px] lg:text-xs font-bold border-2 transition-all duration-300
                     ${step.id === currentStep 
                       ? 'bg-primary-600 border-primary-600 text-white shadow-lg shadow-primary-500/30 scale-110' 
                       : step.id < currentStep
@@ -109,11 +109,11 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
       </div>
 
       {/* Wizard Content */}
-      <div className="flex-1 overflow-y-auto p-6 scroll-smooth">
+      <div className="flex-1 overflow-y-auto p-4 lg:p-6 scroll-smooth">
         
         {/* STEP 1: INSTITUCIONAL */}
         {currentStep === 1 && (
-          <div className="space-y-6 animate-fadeIn">
+          <div className="space-y-4 lg:space-y-6 animate-fadeIn">
             <div className="group">
               <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 transition-colors group-focus-within:text-primary-600 dark:group-focus-within:text-primary-400">Órgão Público</label>
               <input
@@ -122,7 +122,7 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
                 value={formData.organName}
                 onChange={handleChange}
                 placeholder="Ex: Prefeitura Municipal de Salvador"
-                className="w-full p-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-400 outline-none transition-all dark:text-white dark:placeholder-slate-500"
+                className="w-full p-3 lg:p-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-400 outline-none transition-all dark:text-white dark:placeholder-slate-500"
                 autoFocus
               />
               <p className="text-xs text-slate-500 dark:text-slate-500 mt-2">Nome oficial completo do órgão contratante.</p>
@@ -136,7 +136,7 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
                 value={formData.city}
                 onChange={handleChange}
                 placeholder="Ex: Salvador / BA"
-                className="w-full p-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-400 outline-none transition-all dark:text-white dark:placeholder-slate-500"
+                className="w-full p-3 lg:p-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-400 outline-none transition-all dark:text-white dark:placeholder-slate-500"
               />
             </div>
           </div>
@@ -144,7 +144,7 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
 
         {/* STEP 2: REGRAS */}
         {currentStep === 2 && (
-          <div className="space-y-6 animate-fadeIn">
+          <div className="space-y-4 lg:space-y-6 animate-fadeIn">
             <div className="group">
               <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 transition-colors group-focus-within:text-primary-600 dark:group-focus-within:text-primary-400">Modalidade da Licitação</label>
               <div className="relative">
@@ -152,7 +152,7 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
                   name="modality"
                   value={formData.modality}
                   onChange={handleChange}
-                  className="w-full p-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-400 outline-none transition-all dark:text-white appearance-none"
+                  className="w-full p-3 lg:p-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-400 outline-none transition-all dark:text-white appearance-none"
                 >
                   <option value="" disabled>Selecione a modalidade</option>
                   {MODALITIES.map(m => <option key={m} value={m} className="dark:bg-slate-800">{m}</option>)}
@@ -170,7 +170,7 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
                   name="judgmentCriteria"
                   value={formData.judgmentCriteria}
                   onChange={handleChange}
-                  className="w-full p-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-400 outline-none transition-all dark:text-white appearance-none"
+                  className="w-full p-3 lg:p-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-400 outline-none transition-all dark:text-white appearance-none"
                 >
                   <option value="" disabled>Selecione o critério</option>
                   {CRITERIA.map(c => <option key={c} value={c} className="dark:bg-slate-800">{c}</option>)}
@@ -185,16 +185,16 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
 
         {/* STEP 3: OBJETO */}
         {currentStep === 3 && (
-          <div className="space-y-6 animate-fadeIn">
-            <div className="group">
+          <div className="space-y-4 lg:space-y-6 animate-fadeIn">
+            <div className="group h-full flex flex-col">
               <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 transition-colors group-focus-within:text-primary-600 dark:group-focus-within:text-primary-400">Objeto da Licitação</label>
               <textarea
                 name="objectDescription"
                 value={formData.objectDescription}
                 onChange={handleChange}
-                rows={8}
+                rows={6}
                 placeholder="Descreva detalhadamente o item, serviço ou obra. Inclua especificações técnicas essenciais..."
-                className="w-full p-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-400 outline-none resize-none transition-all dark:text-white dark:placeholder-slate-500"
+                className="w-full flex-1 p-3 lg:p-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-400 outline-none resize-none transition-all dark:text-white dark:placeholder-slate-500"
                 autoFocus
               />
             </div>
@@ -207,7 +207,7 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
                 value={formData.estimatedValue}
                 onChange={handleChange}
                 placeholder="Ex: R$ 1.500.000,00"
-                className="w-full p-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-400 outline-none transition-all dark:text-white dark:placeholder-slate-500"
+                className="w-full p-3 lg:p-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-400 outline-none transition-all dark:text-white dark:placeholder-slate-500"
               />
             </div>
           </div>
@@ -215,16 +215,16 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
 
         {/* STEP 4: DETALHES */}
         {currentStep === 4 && (
-          <div className="space-y-6 animate-fadeIn">
+          <div className="space-y-4 lg:space-y-6 animate-fadeIn">
             <div className="group">
               <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 transition-colors group-focus-within:text-primary-600 dark:group-focus-within:text-primary-400">Justificativa da Contratação</label>
               <textarea
                 name="justification"
                 value={formData.justification}
                 onChange={handleChange}
-                rows={5}
-                placeholder="Por que essa contratação é necessária para o interesse público? Qual problema ela resolve?"
-                className="w-full p-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-400 outline-none resize-none transition-all dark:text-white dark:placeholder-slate-500"
+                rows={4}
+                placeholder="Por que essa contratação é necessária para o interesse público?"
+                className="w-full p-3 lg:p-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-400 outline-none resize-none transition-all dark:text-white dark:placeholder-slate-500"
                 autoFocus
               />
             </div>
@@ -236,8 +236,8 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
                 value={formData.additionalInfo}
                 onChange={handleChange}
                 rows={3}
-                placeholder="Prazos de entrega, garantias exigidas, local de execução, ou qualquer outra observação importante..."
-                className="w-full p-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-400 outline-none resize-none transition-all dark:text-white dark:placeholder-slate-500"
+                placeholder="Prazos de entrega, garantias exigidas, local de execução..."
+                className="w-full p-3 lg:p-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-400 outline-none resize-none transition-all dark:text-white dark:placeholder-slate-500"
               />
             </div>
           </div>
@@ -245,11 +245,11 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
       </div>
 
       {/* Footer Actions */}
-      <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex gap-4">
+      <div className="p-4 lg:p-6 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex gap-3 lg:gap-4 shrink-0">
         <button
           onClick={prevStep}
           disabled={currentStep === 1 || isGenerating}
-          className={`px-6 py-3 rounded-xl font-semibold border transition-all duration-200
+          className={`px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl font-semibold border transition-all duration-200 text-sm lg:text-base
             ${currentStep === 1 || isGenerating 
               ? 'border-slate-100 dark:border-slate-800 text-slate-300 dark:text-slate-700 cursor-not-allowed' 
               : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
@@ -262,7 +262,7 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
           <button
             onClick={nextStep}
             disabled={!isStepValid()}
-            className={`flex-1 px-6 py-3 rounded-xl font-bold text-white transition-all duration-200 shadow-lg shadow-primary-500/20
+            className={`flex-1 px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl font-bold text-white transition-all duration-200 shadow-lg shadow-primary-500/20 text-sm lg:text-base
               ${!isStepValid()
                 ? 'bg-slate-300 dark:bg-slate-700 cursor-not-allowed opacity-70 shadow-none'
                 : 'bg-primary-600 hover:bg-primary-700 active:scale-95'
@@ -274,7 +274,7 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
           <button
             onClick={onSubmit}
             disabled={!isStepValid() || isGenerating}
-            className={`flex-1 px-6 py-3 rounded-xl font-bold text-white transition-all duration-200 flex items-center justify-center gap-3
+            className={`flex-1 px-4 lg:px-6 py-2.5 lg:py-3 rounded-xl font-bold text-white transition-all duration-200 flex items-center justify-center gap-2 lg:gap-3 text-sm lg:text-base
               ${!isStepValid() || isGenerating
                 ? 'bg-slate-400 dark:bg-slate-700 cursor-not-allowed opacity-70'
                 : 'bg-emerald-600 hover:bg-emerald-700 active:scale-95 shadow-lg shadow-emerald-500/30'
@@ -286,7 +286,7 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Gerando Documento...
+                <span className="hidden sm:inline">Gerando...</span>
               </>
             ) : (
               <>

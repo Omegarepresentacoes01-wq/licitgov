@@ -19,10 +19,7 @@ interface ErrorBoundaryState {
 
 // Error Boundary para evitar tela branca completa em produção
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
+  public state: ErrorBoundaryState = { hasError: false, error: null };
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
@@ -73,6 +70,9 @@ const AppContent: React.FC = () => {
   const [outputContent, setOutputContent] = useState<string>('');
   const [fullGeneratedText, setFullGeneratedText] = useState<string>(''); // To save later
   
+  // Mobile Sidebar State
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   // Theme state
   const [darkMode, setDarkMode] = useState(() => {
     // Check window existence for SSR safety
@@ -120,6 +120,7 @@ const AppContent: React.FC = () => {
     setOutputContent(''); 
     setFullGeneratedText('');
     setGenState({ isGenerating: false, error: null });
+    setIsSidebarOpen(false); // Close sidebar on mobile selection
   };
 
   const handleGenerate = useCallback(async () => {
@@ -155,7 +156,7 @@ const AppContent: React.FC = () => {
       console.error(error);
       let errorMessage = "Erro ao gerar o documento.";
       if (error.message && (error.message.includes('API_KEY') || error.message.includes('API Key'))) {
-        errorMessage = "Chave de API não configurada corretamente (VITE_API_KEY).";
+        errorMessage = "Chave de API não configurada. Verifique se a variável VITE_API_KEY está definida.";
       } else if (error.message) {
         errorMessage = `Erro: ${error.message}`;
       }
@@ -192,7 +193,9 @@ const AppContent: React.FC = () => {
 
   // MAIN APP VIEW
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+    <div className="flex flex-col lg:flex-row h-screen w-full overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+      
+      {/* Mobile Sidebar Overlay */}
       <Sidebar 
         selectedDoc={selectedDoc} 
         onSelect={handleDocumentSelect} 
@@ -202,35 +205,48 @@ const AppContent: React.FC = () => {
         currentUser={currentUser}
         onLogout={handleLogout}
         onAdminClick={() => setView('admin')}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
       
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
         {/* Header decoration */}
         <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-primary-100/20 to-transparent dark:from-primary-900/10 pointer-events-none z-0"></div>
 
-        <header className="px-6 py-4 shrink-0 flex justify-between items-center z-10">
-          <div>
-            <h2 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
-              {selectedDoc}
-            </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Ambiente seguro | Seus dados estão isolados</p>
+        {/* Mobile Header */}
+        <header className="px-4 py-3 lg:px-6 lg:py-4 shrink-0 flex justify-between items-center z-10 border-b lg:border-none border-slate-200 dark:border-slate-800 bg-white lg:bg-transparent dark:bg-slate-900 lg:dark:bg-transparent">
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setIsSidebarOpen(true)}
+              className="lg:hidden p-2 -ml-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
+            >
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <div>
+              <h2 className="text-xl lg:text-2xl font-bold text-slate-800 dark:text-white tracking-tight truncate max-w-[200px] sm:max-w-md">
+                {selectedDoc}
+              </h2>
+              <p className="text-xs lg:text-sm text-slate-500 dark:text-slate-400 hidden sm:block">Ambiente seguro | Seus dados estão isolados</p>
+            </div>
           </div>
           
           {genState.error && (
-            <div className="animate-fadeIn bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg px-4 py-2 flex items-center gap-2">
-                <svg className="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="absolute top-16 right-4 left-4 lg:static lg:w-auto animate-fadeIn bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg px-4 py-2 flex items-center gap-2 shadow-md lg:shadow-none z-20">
+                <svg className="w-5 h-5 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="text-sm font-medium text-red-700 dark:text-red-300">
+                <span className="text-xs sm:text-sm font-medium text-red-700 dark:text-red-300 break-words">
                   {genState.error}
                 </span>
             </div>
           )}
         </header>
 
-        <div className="flex-1 flex px-6 pb-6 gap-6 overflow-hidden z-10">
+        <div className="flex-1 flex flex-col lg:flex-row px-4 lg:px-6 pb-6 gap-4 lg:gap-6 overflow-hidden z-10">
           {/* Left Panel: Inputs */}
-          <div className="w-1/3 min-w-[400px] h-full transition-all flex flex-col">
+          <div className="w-full lg:w-1/3 lg:min-w-[400px] h-1/2 lg:h-full transition-all flex flex-col order-1">
             <InputForm 
               formData={formData} 
               onChange={setFormData} 
@@ -240,7 +256,7 @@ const AppContent: React.FC = () => {
           </div>
 
           {/* Right Panel: Output */}
-          <div className="flex-1 h-full flex flex-col">
+          <div className="w-full lg:flex-1 h-1/2 lg:h-full flex flex-col order-2">
             <ResultViewer 
               content={outputContent} 
               isGenerating={genState.isGenerating}

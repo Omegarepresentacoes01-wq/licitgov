@@ -10,6 +10,8 @@ interface SidebarProps {
   currentUser: User | null;
   onLogout: () => void;
   onAdminClick: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 const DocIcon = () => (
@@ -50,106 +52,147 @@ const docIcons: Record<DocumentType, React.ReactNode> = {
   [DocumentType.VIABILIDADE]: <ChartIcon />,
 };
 
-export const Sidebar: React.FC<SidebarProps> = ({ selectedDoc, onSelect, isGenerating, darkMode, toggleDarkMode, currentUser, onLogout, onAdminClick }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ 
+  selectedDoc, 
+  onSelect, 
+  isGenerating, 
+  darkMode, 
+  toggleDarkMode, 
+  currentUser, 
+  onLogout, 
+  onAdminClick,
+  isOpen = false,
+  onClose
+}) => {
   return (
-    <aside className="w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col h-full z-20 shrink-0 transition-colors duration-300">
-      <div className="p-6">
-        <div className="flex items-center gap-3 mb-1">
-          <div className="bg-primary-600 p-2 rounded-lg text-white shadow-lg shadow-primary-500/30">
-            <ScaleIcon />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-slate-900 dark:text-white leading-none">
-              LicitGov AI
-            </h1>
-            <p className="text-xs text-primary-600 dark:text-primary-400 font-medium mt-1">SaaS Jurídico</p>
-          </div>
-        </div>
-      </div>
-      
-      {/* User Profile Card */}
-      {currentUser && (
-        <div className="px-4 mb-6">
-            <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
-                <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 flex items-center justify-center font-bold text-xs">
-                        {currentUser.name.charAt(0)}
-                    </div>
-                    <div className="overflow-hidden">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{currentUser.name}</p>
-                        <p className="text-xs text-slate-500 truncate">{currentUser.organization}</p>
-                    </div>
-                </div>
-                {currentUser.role === 'admin' && (
-                    <button 
-                        onClick={onAdminClick}
-                        className="w-full text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 py-1 rounded-md font-medium hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors mb-2"
-                    >
-                        Painel Admin
-                    </button>
-                )}
-                <button 
-                    onClick={onLogout}
-                    className="w-full text-xs flex items-center justify-center gap-1 text-slate-500 hover:text-red-500 transition-colors"
-                >
-                    Sair da conta
-                </button>
-            </div>
-        </div>
+    <>
+      {/* Mobile Backdrop */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm transition-opacity"
+          onClick={onClose}
+        />
       )}
 
-      <div className="px-4 mb-2">
-        <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 px-2">Gerar Novo</p>
-      </div>
-
-      <nav className="flex-1 overflow-y-auto px-3 space-y-1">
-        {Object.values(DocumentType).map((doc) => (
-          <button
-            key={doc}
-            onClick={() => !isGenerating && onSelect(doc)}
-            disabled={isGenerating}
-            className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 flex items-center gap-3 group
-              ${selectedDoc === doc 
-                ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 shadow-sm' 
-                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
-              }
-              ${isGenerating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-            `}
+      {/* Sidebar Container */}
+      <aside className={`
+        fixed lg:static inset-y-0 left-0 z-50
+        w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 
+        flex flex-col h-full shrink-0 transition-transform duration-300 ease-in-out
+        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        <div className="p-6 flex justify-between items-start">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="bg-primary-600 p-2 rounded-lg text-white shadow-lg shadow-primary-500/30">
+              <ScaleIcon />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-slate-900 dark:text-white leading-none">
+                LicitGov AI
+              </h1>
+              <p className="text-xs text-primary-600 dark:text-primary-400 font-medium mt-1">SaaS Jurídico</p>
+            </div>
+          </div>
+          
+          {/* Mobile Close Button */}
+          <button 
+            onClick={onClose}
+            className="lg:hidden p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
           >
-            <span className={`${selectedDoc === doc ? 'text-primary-600 dark:text-primary-400' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300'}`}>
-              {docIcons[doc]}
-            </span>
-            <span className="text-sm font-medium leading-tight">{doc.split(' (')[0]}</span>
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
-        ))}
-      </nav>
-
-      <div className="p-4 border-t border-slate-200 dark:border-slate-800">
-        <button
-          onClick={toggleDarkMode}
-          className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            {darkMode ? (
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-              </svg>
-            ) : (
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            )}
-            <span className="text-sm font-medium">{darkMode ? 'Modo Escuro' : 'Modo Claro'}</span>
-          </div>
-          <div className={`w-10 h-5 rounded-full relative transition-colors ${darkMode ? 'bg-primary-600' : 'bg-slate-300'}`}>
-            <div className={`w-3 h-3 bg-white rounded-full absolute top-1 transition-all ${darkMode ? 'left-6' : 'left-1'}`} />
-          </div>
-        </button>
-        
-        <div className="mt-4 text-xs text-center text-slate-400 dark:text-slate-600">
-          LicitGov SaaS v1.0
         </div>
-      </div>
-    </aside>
+        
+        {/* User Profile Card */}
+        {currentUser && (
+          <div className="px-4 mb-6">
+              <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+                  <div className="flex items-center gap-3 mb-2">
+                      <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 flex items-center justify-center font-bold text-xs">
+                          {currentUser.name.charAt(0)}
+                      </div>
+                      <div className="overflow-hidden">
+                          <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{currentUser.name}</p>
+                          <p className="text-xs text-slate-500 truncate">{currentUser.organization}</p>
+                      </div>
+                  </div>
+                  {currentUser.role === 'admin' && (
+                      <button 
+                          onClick={onAdminClick}
+                          className="w-full text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 py-1 rounded-md font-medium hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors mb-2"
+                      >
+                          Painel Admin
+                      </button>
+                  )}
+                  <button 
+                      onClick={onLogout}
+                      className="w-full text-xs flex items-center justify-center gap-1 text-slate-500 hover:text-red-500 transition-colors"
+                  >
+                      Sair da conta
+                  </button>
+              </div>
+          </div>
+        )}
+
+        <div className="px-4 mb-2">
+          <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 px-2">Gerar Novo</p>
+        </div>
+
+        <nav className="flex-1 overflow-y-auto px-3 space-y-1">
+          {Object.values(DocumentType).map((doc) => (
+            <button
+              key={doc}
+              onClick={() => {
+                if (!isGenerating) {
+                  onSelect(doc);
+                }
+              }}
+              disabled={isGenerating}
+              className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 flex items-center gap-3 group
+                ${selectedDoc === doc 
+                  ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 shadow-sm' 
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                }
+                ${isGenerating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+              `}
+            >
+              <span className={`${selectedDoc === doc ? 'text-primary-600 dark:text-primary-400' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300'}`}>
+                {docIcons[doc]}
+              </span>
+              <span className="text-sm font-medium leading-tight">{doc.split(' (')[0]}</span>
+            </button>
+          ))}
+        </nav>
+
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800 mt-auto">
+          <button
+            onClick={toggleDarkMode}
+            className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              {darkMode ? (
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              )}
+              <span className="text-sm font-medium">{darkMode ? 'Modo Escuro' : 'Modo Claro'}</span>
+            </div>
+            <div className={`w-10 h-5 rounded-full relative transition-colors ${darkMode ? 'bg-primary-600' : 'bg-slate-300'}`}>
+              <div className={`w-3 h-3 bg-white rounded-full absolute top-1 transition-all ${darkMode ? 'left-6' : 'left-1'}`} />
+            </div>
+          </button>
+          
+          <div className="mt-4 text-xs text-center text-slate-400 dark:text-slate-600">
+            LicitGov SaaS v1.1
+          </div>
+        </div>
+      </aside>
+    </>
   );
 };
