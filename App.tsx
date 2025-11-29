@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, Component, ReactNode, ErrorInfo } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { InputForm } from './components/InputForm';
 import { ResultViewer } from './components/ResultViewer';
@@ -9,7 +9,7 @@ import { generateDocumentStream } from './services/geminiService';
 import { getCurrentUser, logout, saveDocument } from './services/mockBackend';
 
 interface ErrorBoundaryProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 interface ErrorBoundaryState {
@@ -18,17 +18,20 @@ interface ErrorBoundaryState {
 }
 
 // Error Boundary para evitar tela branca completa em produção
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = {
+      hasError: false,
+      error: null
+    };
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("Uncaught error:", error, errorInfo);
   }
 
@@ -196,7 +199,7 @@ const AppContent: React.FC = () => {
 
   // MAIN APP VIEW
   return (
-    <div className="flex flex-col lg:flex-row h-screen w-full overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+    <div className="flex flex-col lg:flex-row h-screen w-full overflow-hidden bg-slate-50 dark:bg-[#0b0c10] transition-colors duration-300">
       
       {/* Mobile Sidebar Overlay */}
       <Sidebar 
@@ -214,10 +217,10 @@ const AppContent: React.FC = () => {
       
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
         {/* Header decoration */}
-        <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-primary-100/20 to-transparent dark:from-primary-900/10 pointer-events-none z-0"></div>
+        <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-primary-100/20 to-transparent dark:from-primary-900/5 pointer-events-none z-0"></div>
 
         {/* Mobile Header */}
-        <header className="px-4 py-3 lg:px-6 lg:py-4 shrink-0 flex justify-between items-center z-10 border-b lg:border-none border-slate-200 dark:border-slate-800 bg-white lg:bg-transparent dark:bg-slate-900 lg:dark:bg-transparent">
+        <header className="px-4 py-3 lg:px-6 lg:py-4 shrink-0 flex justify-between items-center z-10 border-b lg:border-none border-slate-200 dark:border-slate-800 bg-white lg:bg-transparent dark:bg-[#15171e] lg:dark:bg-transparent">
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setIsSidebarOpen(true)}
@@ -231,7 +234,7 @@ const AppContent: React.FC = () => {
               <h2 className="text-xl lg:text-2xl font-bold text-slate-800 dark:text-white tracking-tight truncate max-w-[200px] sm:max-w-md">
                 {selectedDoc}
               </h2>
-              <p className="text-xs lg:text-sm text-slate-500 dark:text-slate-400 hidden sm:block">Ambiente seguro | Seus dados estão isolados</p>
+              <p className="text-xs lg:text-sm text-slate-500 dark:text-slate-400 hidden sm:block">Ambiente Seguro &bull; Dados Isolados</p>
             </div>
           </div>
           
