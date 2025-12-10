@@ -12,7 +12,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser, onE
   const [showAddModal, setShowAddModal] = useState(false);
   const [totalDocs, setTotalDocs] = useState(0);
   
-  // New User Form State
   const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newOrg, setNewOrg] = useState('');
@@ -24,7 +23,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser, onE
   }, []);
 
   const loadData = () => {
-    // Carrega usuários e ordena por data de criação (mais recentes primeiro)
     const allUsers = getAllUsers();
     const sortedUsers = [...allUsers].sort((a, b) => 
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -44,19 +42,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser, onE
       createUser({
         name: newName,
         email: newEmail,
-        role: 'user', // Default create role is user
+        role: 'user',
         organization: newOrg,
         active: true
       }, newPassword);
 
       setShowAddModal(false);
-      // Reset Form
       setNewName('');
       setNewEmail('');
       setNewOrg('');
       setNewPassword('');
       setError('');
-      
       loadData();
     } catch (err: any) {
       setError(err.message);
@@ -69,7 +65,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser, onE
   };
 
   const handleDelete = (userId: string) => {
-      if(window.confirm("Tem certeza que deseja excluir este usuário permanentemente?")) {
+      if(window.confirm("Confirmar exclusão definitiva?")) {
         try {
             deleteUser(userId);
             loadData();
@@ -79,7 +75,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser, onE
       }
   };
 
-  // Helper para identificar usuários criados nas últimas 48h
   const isNewUser = (dateString: string) => {
     const createdDate = new Date(dateString);
     const twoDaysAgo = new Date();
@@ -88,148 +83,98 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser, onE
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0b0c10] transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-dark-bg font-sans">
       {/* Header */}
-      <header className="bg-white dark:bg-[#15171e] border-b border-slate-200 dark:border-slate-800 px-8 py-6 flex justify-between items-center">
-        <div className="flex items-center gap-4">
-            <div className="bg-gradient-to-br from-purple-600 to-purple-700 p-2.5 rounded-xl text-white shadow-lg shadow-purple-500/20">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      <header className="bg-white dark:bg-dark-card border-b border-slate-200 dark:border-slate-700 px-6 py-4 flex justify-between items-center">
+        <div className="flex items-center gap-3">
+            <div className="bg-slate-900 p-1.5 rounded text-white">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                 </svg>
             </div>
-            <div>
-                <h1 className="text-2xl font-bold text-slate-800 dark:text-white font-display">Portal Administrativo</h1>
-                <p className="text-sm text-slate-500 font-medium">Gestão de Licenças e Usuários SaaS</p>
-            </div>
+            <h1 className="text-lg font-bold text-slate-800 dark:text-white">Administração</h1>
         </div>
         <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-                <p className="text-sm font-bold text-slate-900 dark:text-white">{currentUser.name}</p>
-                <p className="text-xs text-slate-500">Super Administrador</p>
+                <p className="text-sm font-semibold text-slate-800 dark:text-white">{currentUser.name}</p>
             </div>
             <button 
-            onClick={onExit}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors font-medium text-sm"
+                onClick={onExit}
+                className="px-3 py-1.5 bg-white border border-slate-300 dark:bg-slate-800 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded text-sm font-medium hover:bg-slate-50 transition-colors"
             >
-            <span>Voltar ao App</span>
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
+                Sair
             </button>
         </div>
       </header>
 
-      {/* Stats */}
-      <div className="px-8 py-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-[#15171e] p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                 <svg className="w-20 h-20" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path></svg>
-            </div>
-            <h3 className="text-slate-500 dark:text-slate-400 text-sm font-bold uppercase tracking-wide">Total de Usuários</h3>
-            <p className="text-3xl font-bold text-slate-900 dark:text-white mt-2 font-display">{users.length}</p>
+      {/* Stats Cards - Flat Style */}
+      <div className="px-6 py-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white dark:bg-dark-card p-5 rounded border border-slate-200 dark:border-slate-700 shadow-soft">
+            <h3 className="text-slate-500 text-xs font-semibold uppercase tracking-wide">Total de Usuários</h3>
+            <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{users.length}</p>
         </div>
-        <div className="bg-white dark:bg-[#15171e] p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-emerald-500">
-                 <svg className="w-20 h-20" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
-            </div>
-            <h3 className="text-slate-500 dark:text-slate-400 text-sm font-bold uppercase tracking-wide">Usuários Ativos</h3>
-            <p className="text-3xl font-bold text-emerald-600 mt-2 font-display">{users.filter(u => u.active).length}</p>
+        <div className="bg-white dark:bg-dark-card p-5 rounded border border-slate-200 dark:border-slate-700 shadow-soft">
+            <h3 className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold uppercase tracking-wide">Contas Ativas</h3>
+            <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{users.filter(u => u.active).length}</p>
         </div>
-        <div className="bg-white dark:bg-[#15171e] p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-blue-500">
-                 <svg className="w-20 h-20" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd"></path></svg>
-            </div>
-            <h3 className="text-slate-500 dark:text-slate-400 text-sm font-bold uppercase tracking-wide">Documentos Gerados</h3>
-            <p className="text-3xl font-bold text-blue-600 mt-2 font-display">{totalDocs}</p>
+        <div className="bg-white dark:bg-dark-card p-5 rounded border border-slate-200 dark:border-slate-700 shadow-soft">
+            <h3 className="text-blue-600 dark:text-blue-400 text-xs font-semibold uppercase tracking-wide">Documentos Gerados</h3>
+            <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{totalDocs}</p>
         </div>
       </div>
 
       {/* Users Table */}
-      <div className="px-8 pb-8">
-        <div className="bg-white dark:bg-[#15171e] rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-            <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                <div>
-                    <h2 className="text-lg font-bold text-slate-800 dark:text-white font-display">Gerenciar Acessos</h2>
-                    <p className="text-sm text-slate-500">Lista ordenada pelos cadastros mais recentes</p>
-                </div>
+      <div className="px-6 pb-6">
+        <div className="bg-white dark:bg-dark-card rounded border border-slate-200 dark:border-slate-700 shadow-soft">
+            <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                <h2 className="text-sm font-bold text-slate-800 dark:text-white">Usuários do Sistema</h2>
                 <button 
                     onClick={() => setShowAddModal(true)}
-                    className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-lg shadow-primary-500/30 flex items-center gap-2"
+                    className="bg-primary-700 hover:bg-primary-800 text-white px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wide transition-colors"
                 >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    Novo Usuário
+                    + Novo Usuário
                 </button>
             </div>
             <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                    <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs uppercase font-semibold">
+                <table className="w-full text-left text-sm">
+                    <thead className="bg-white dark:bg-dark-card border-b border-slate-200 dark:border-slate-700 text-slate-500 font-medium">
                         <tr>
-                            <th className="px-6 py-4">Usuário</th>
-                            <th className="px-6 py-4">Organização</th>
-                            <th className="px-6 py-4">Data Cadastro</th>
-                            <th className="px-6 py-4">Função</th>
-                            <th className="px-6 py-4">Status</th>
-                            <th className="px-6 py-4 text-right">Ações</th>
+                            <th className="px-4 py-3 w-1/4">Nome</th>
+                            <th className="px-4 py-3">Organização</th>
+                            <th className="px-4 py-3">Cadastro</th>
+                            <th className="px-4 py-3">Status</th>
+                            <th className="px-4 py-3 text-right">Ações</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                         {users.map(user => (
-                            <tr key={user.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                                <td className="px-6 py-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-9 h-9 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold text-xs ring-2 ring-white dark:ring-slate-800">
-                                            {user.name.charAt(0)}
-                                        </div>
-                                        <div>
-                                            <div className="font-medium text-slate-900 dark:text-white flex items-center gap-2">
-                                                {user.name}
-                                                {isNewUser(user.createdAt) && (
-                                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
-                                                        NOVO
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <div className="text-sm text-slate-500">{user.email}</div>
-                                        </div>
+                            <tr key={user.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                                <td className="px-4 py-3">
+                                    <div className="font-medium text-slate-900 dark:text-white">
+                                        {user.name}
+                                        {user.role === 'admin' && <span className="ml-2 text-[10px] bg-slate-200 text-slate-600 px-1 rounded">ADMIN</span>}
+                                        {isNewUser(user.createdAt) && <span className="ml-2 text-[10px] bg-blue-100 text-blue-700 px-1 rounded">NOVO</span>}
                                     </div>
+                                    <div className="text-xs text-slate-500">{user.email}</div>
                                 </td>
-                                <td className="px-6 py-4 text-slate-600 dark:text-slate-400 text-sm font-medium">{user.organization}</td>
-                                <td className="px-6 py-4 text-slate-600 dark:text-slate-400 text-sm font-mono">
+                                <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{user.organization}</td>
+                                <td className="px-4 py-3 text-slate-500 text-xs">
                                     {new Date(user.createdAt).toLocaleDateString('pt-BR')}
-                                    <span className="text-xs text-slate-400 block">
-                                        {new Date(user.createdAt).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}
-                                    </span>
                                 </td>
-                                <td className="px-6 py-4">
-                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                                        user.role === 'admin' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
-                                    }`}>
-                                        {user.role === 'admin' ? 'ADMIN' : 'USUÁRIO'}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                                <td className="px-4 py-3">
+                                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                                         user.active ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
                                     }`}>
-                                        {user.active ? 'ATIVO' : 'BLOQUEADO'}
+                                        {user.active ? 'Ativo' : 'Bloqueado'}
                                     </span>
                                 </td>
-                                <td className="px-6 py-4 text-right space-x-2">
+                                <td className="px-4 py-3 text-right space-x-2">
                                     {user.role !== 'admin' && (
                                         <>
-                                            <button 
-                                                onClick={() => handleToggleStatus(user.id)}
-                                                className="text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
-                                            >
+                                            <button onClick={() => handleToggleStatus(user.id)} className="text-slate-500 hover:text-slate-800 dark:hover:text-white font-medium text-xs">
                                                 {user.active ? 'Bloquear' : 'Ativar'}
                                             </button>
-                                            <button 
-                                                onClick={() => handleDelete(user.id)}
-                                                className="text-xs font-bold uppercase tracking-wider text-red-500 hover:text-red-700 transition-colors"
-                                            >
+                                            <button onClick={() => handleDelete(user.id)} className="text-red-500 hover:text-red-700 font-medium text-xs">
                                                 Excluir
                                             </button>
                                         </>
@@ -243,40 +188,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser, onE
         </div>
       </div>
 
-      {/* Add User Modal */}
+      {/* Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-            <div className="bg-white dark:bg-[#15171e] rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-200 dark:border-slate-700">
-                <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white font-display">Novo Usuário</h3>
-                    <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                <form onSubmit={handleCreateUser} className="space-y-4">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-dark-card rounded shadow-xl max-w-sm w-full p-6 border border-slate-200 dark:border-slate-700">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Adicionar Usuário</h3>
+                <form onSubmit={handleCreateUser} className="space-y-3">
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Nome Completo</label>
-                        <input type="text" required className="w-full p-3 rounded-xl border border-slate-200 dark:bg-slate-900 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-primary-500 outline-none transition-all font-medium" value={newName} onChange={e => setNewName(e.target.value)} placeholder="Ex: Maria Silva" />
+                        <label className="block text-xs font-semibold text-slate-500 mb-1">Nome</label>
+                        <input type="text" required className="w-full px-3 py-2 border rounded border-slate-300 dark:border-slate-600 dark:bg-slate-900 dark:text-white text-sm" value={newName} onChange={e => setNewName(e.target.value)} />
                     </div>
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">E-mail</label>
-                        <input type="email" required className="w-full p-3 rounded-xl border border-slate-200 dark:bg-slate-900 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-primary-500 outline-none transition-all font-medium" value={newEmail} onChange={e => setNewEmail(e.target.value)} placeholder="Ex: maria@licitacao.gov.br" />
+                        <label className="block text-xs font-semibold text-slate-500 mb-1">E-mail</label>
+                        <input type="email" required className="w-full px-3 py-2 border rounded border-slate-300 dark:border-slate-600 dark:bg-slate-900 dark:text-white text-sm" value={newEmail} onChange={e => setNewEmail(e.target.value)} />
                     </div>
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Organização</label>
-                        <input type="text" required className="w-full p-3 rounded-xl border border-slate-200 dark:bg-slate-900 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-primary-500 outline-none transition-all font-medium" value={newOrg} onChange={e => setNewOrg(e.target.value)} placeholder="Ex: Secretaria de Saúde" />
+                        <label className="block text-xs font-semibold text-slate-500 mb-1">Organização</label>
+                        <input type="text" required className="w-full px-3 py-2 border rounded border-slate-300 dark:border-slate-600 dark:bg-slate-900 dark:text-white text-sm" value={newOrg} onChange={e => setNewOrg(e.target.value)} />
                     </div>
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Senha Inicial</label>
-                        <input type="text" required className="w-full p-3 rounded-xl border border-slate-200 dark:bg-slate-900 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-primary-500 outline-none transition-all font-medium" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Defina a senha" />
-                        <p className="text-xs text-slate-400 mt-1">O usuário deverá usar esta senha no primeiro acesso.</p>
+                        <label className="block text-xs font-semibold text-slate-500 mb-1">Senha Provisória</label>
+                        <input type="text" required className="w-full px-3 py-2 border rounded border-slate-300 dark:border-slate-600 dark:bg-slate-900 dark:text-white text-sm" value={newPassword} onChange={e => setNewPassword(e.target.value)} />
                     </div>
-                    {error && <p className="text-red-500 text-sm bg-red-50 dark:bg-red-900/20 p-2 rounded">{error}</p>}
-                    <div className="flex gap-3 pt-4">
-                        <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors font-bold">Cancelar</button>
-                        <button type="submit" className="flex-1 px-4 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 shadow-lg shadow-primary-500/30 transition-all font-bold">Criar Usuário</button>
+                    {error && <p className="text-red-500 text-xs">{error}</p>}
+                    <div className="flex gap-2 pt-2">
+                        <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-2 border rounded text-sm text-slate-600 hover:bg-slate-50">Cancelar</button>
+                        <button type="submit" className="flex-1 py-2 bg-primary-700 text-white rounded text-sm hover:bg-primary-800 font-medium">Salvar</button>
                     </div>
                 </form>
             </div>

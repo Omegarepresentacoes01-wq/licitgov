@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
-import { FormData } from '../types';
+import { FormData, DocumentType } from '../types';
 
 interface InputFormProps {
   formData: FormData;
   onChange: (data: FormData) => void;
   onSubmit: () => void;
   isGenerating: boolean;
+  isSidebarOpen?: boolean;
+  selectedDoc: DocumentType;
 }
 
 const STEPS = [
-  { id: 1, title: 'Institucional', description: 'Órgão e Local' },
-  { id: 2, title: 'Regras', description: 'Modalidade' },
-  { id: 3, title: 'Objeto', description: 'Especificação' },
-  { id: 4, title: 'Finalizar', description: 'Detalhes finais' }
+  { id: 1, title: 'Institucional', description: 'Dados do Órgão' },
+  { id: 2, title: 'Modalidade', description: 'Regras Legais' },
+  { id: 3, title: 'Objeto', description: 'O que será contratado' },
+  { id: 4, title: 'Finalização', description: 'Justificativa e Detalhes' }
 ];
 
 const MODALITIES = [
@@ -32,9 +34,11 @@ const CRITERIA = [
   'Maior Lance (Leilão)'
 ];
 
-export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubmit, isGenerating }) => {
+export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubmit, isGenerating, selectedDoc }) => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [focusedField, setFocusedField] = useState<string | null>(null);
+  const isImpugnment = selectedDoc === DocumentType.IMPUGNACAO;
+  const isPriceResearch = selectedDoc === DocumentType.PESQUISA_PRECO;
+  const isAdhesion = selectedDoc === DocumentType.ADESAO_ATA;
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -53,202 +57,236 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
     switch (currentStep) {
       case 1: return !!formData.organName && !!formData.city;
       case 2: return !!formData.modality && !!formData.judgmentCriteria;
-      case 3: return !!formData.objectDescription && !!formData.estimatedValue;
-      case 4: return !!formData.justification;
+      case 3: return !!formData.objectDescription;
+      case 4: return isImpugnment ? !!formData.impugnmentText : (isPriceResearch ? true : (isAdhesion ? true : !!formData.justification));
       default: return false;
     }
   };
 
   return (
-    <div className="bg-white dark:bg-[#15171e] rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 h-full flex flex-col overflow-hidden transition-all duration-300 relative z-10">
+    <div className="bg-white dark:bg-navy-surface rounded-xl shadow-soft border border-slate-200 dark:border-white/5 h-full flex flex-col overflow-hidden">
       
-      {/* Sleek Header */}
-      <div className="p-6 lg:p-8 shrink-0">
-        <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-display font-bold text-slate-800 dark:text-white tracking-tight">
-               Configuração
-            </h2>
-            <div className="text-xs font-bold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 px-3 py-1.5 rounded-full border border-primary-100 dark:border-primary-900/30">
-                Passo {currentStep} de {STEPS.length}
-            </div>
-        </div>
+      {/* Header Corporativo */}
+      <div className="px-6 py-5 border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-navy-800/50">
+        <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-4 font-sans">
+           {isImpugnment ? 'Advogado Virtual (Defesa)' : isPriceResearch ? 'Analista de Mercado' : isAdhesion ? 'Gestão de Caronas (Adesão)' : 'Assistente de Criação'}
+        </h2>
         
-        {/* Minimalist Progress */}
-        <div className="flex items-center w-full">
-            {STEPS.map((step, idx) => (
-                <div key={step.id} className="flex-1 flex items-center">
-                    <div className={`
-                        flex flex-col items-center justify-center relative z-10
-                    `}>
-                        <div className={`
-                            w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 shadow-lg
-                            ${step.id <= currentStep 
-                                ? 'bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-primary-500/30 scale-100' 
-                                : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 shadow-none'
-                            }
-                        `}>
-                            {step.id < currentStep ? '✓' : step.id}
-                        </div>
+        {/* Progress Bar Limpa */}
+        <div className="flex items-center justify-between gap-2">
+            {STEPS.map((step) => {
+                const isActive = step.id === currentStep;
+                const isCompleted = step.id < currentStep;
+                
+                return (
+                    <div key={step.id} className="flex flex-col items-center flex-1">
+                         <div className={`
+                            w-full h-1.5 rounded-full mb-2 transition-colors duration-300
+                            ${isActive ? 'bg-primary-500' : isCompleted ? 'bg-primary-300/50' : 'bg-slate-200 dark:bg-navy-700'}
+                         `}></div>
+                         <span className={`text-[10px] font-bold uppercase tracking-wide font-sans ${isActive ? 'text-primary-600 dark:text-primary-400' : 'text-slate-400'}`}>
+                             Passo {step.id}
+                         </span>
                     </div>
-                    {idx < STEPS.length - 1 && (
-                        <div className="h-[2px] w-full bg-slate-100 dark:bg-slate-800 mx-2 relative overflow-hidden rounded-full">
-                            <div className={`
-                                absolute left-0 top-0 h-full bg-primary-500 transition-all duration-700 ease-out
-                                ${step.id < currentStep ? 'w-full' : 'w-0'}
-                            `} />
-                        </div>
-                    )}
-                </div>
-            ))}
-        </div>
-        <div className="mt-3 text-sm font-semibold text-primary-600 dark:text-primary-400 animate-fadeIn">
-            {STEPS[currentStep - 1].title} &mdash; <span className="text-slate-400 font-normal">{STEPS[currentStep - 1].description}</span>
+                )
+            })}
         </div>
       </div>
 
-      {/* Form Content Area */}
-      <div className="flex-1 overflow-y-auto px-6 lg:px-8 pb-4 scroll-smooth">
-        <div className="space-y-6 lg:space-y-8 py-2">
-            
-            {/* STEP 1: INSTITUCIONAL */}
+      {/* Form Area */}
+      <div className="flex-1 overflow-y-auto px-6 py-6 scroll-smooth bg-white dark:bg-navy-surface">
+        <div className="max-w-xl mx-auto space-y-6">
+            <h3 className="text-base font-bold text-slate-800 dark:text-white border-l-4 border-primary-500 pl-3 font-sans">
+                {currentStep === 4 && isAdhesion 
+                  ? 'Dados da Ata de Origem' 
+                  : currentStep === 4 && isImpugnment 
+                  ? 'Argumentação da Empresa'
+                  : STEPS[currentStep - 1].title
+                }
+                <span className="block text-sm font-medium text-slate-500 dark:text-slate-400 mt-0.5">{STEPS[currentStep - 1].description}</span>
+            </h3>
+
+            {/* STEP 1 */}
             {currentStep === 1 && (
-            <div className="space-y-6 animate-slideUp">
-                <div className={`group transition-all duration-300 ${focusedField === 'organName' ? 'transform scale-[1.01]' : ''}`}>
-                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Órgão Público</label>
+            <div className="space-y-5 animate-fadeIn">
+                <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 font-sans">Nome do Órgão Público</label>
                     <input
                         type="text"
                         name="organName"
                         value={formData.organName}
                         onChange={handleChange}
-                        onFocus={() => setFocusedField('organName')}
-                        onBlur={() => setFocusedField(null)}
                         placeholder="Ex: Prefeitura Municipal de..."
-                        className="w-full h-14 px-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-500 outline-none transition-all dark:text-white placeholder-slate-400 font-medium text-lg"
+                        className="w-full px-4 py-3 bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white placeholder-slate-400 font-sans"
                         autoFocus
                     />
                 </div>
 
-                <div className={`group transition-all duration-300 ${focusedField === 'city' ? 'transform scale-[1.01]' : ''}`}>
-                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Localidade</label>
+                <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 font-sans">Localidade (Cidade/UF)</label>
                     <input
                         type="text"
                         name="city"
                         value={formData.city}
                         onChange={handleChange}
-                        onFocus={() => setFocusedField('city')}
-                        onBlur={() => setFocusedField(null)}
                         placeholder="Cidade / UF"
-                        className="w-full h-14 px-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-500 outline-none transition-all dark:text-white placeholder-slate-400 font-medium"
+                        className="w-full px-4 py-3 bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white placeholder-slate-400 font-sans"
                     />
                 </div>
             </div>
             )}
 
-            {/* STEP 2: REGRAS */}
+            {/* STEP 2 */}
             {currentStep === 2 && (
-            <div className="space-y-6 animate-slideUp">
-                <div className="group">
-                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Modalidade</label>
+            <div className="space-y-5 animate-fadeIn">
+                <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 font-sans">Modalidade de Licitação</label>
                     <div className="relative">
                         <select
-                        name="modality"
-                        value={formData.modality}
-                        onChange={handleChange}
-                        className="w-full h-14 px-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-500 outline-none transition-all dark:text-white font-medium appearance-none cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800"
+                            name="modality"
+                            value={formData.modality}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3 bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white cursor-pointer appearance-none font-sans"
                         >
-                        <option value="" disabled>Selecione a modalidade</option>
-                        {MODALITIES.map(m => <option key={m} value={m} className="dark:bg-slate-800">{m}</option>)}
+                            <option value="" disabled>Selecione...</option>
+                            {MODALITIES.map(m => <option key={m} value={m}>{m}</option>)}
                         </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-500">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                             <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                         </div>
                     </div>
                 </div>
 
-                <div className="group">
-                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Critério de Julgamento</label>
+                <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 font-sans">Critério de Julgamento</label>
                     <div className="relative">
                         <select
-                        name="judgmentCriteria"
-                        value={formData.judgmentCriteria}
-                        onChange={handleChange}
-                        className="w-full h-14 px-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-500 outline-none transition-all dark:text-white font-medium appearance-none cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800"
+                            name="judgmentCriteria"
+                            value={formData.judgmentCriteria}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3 bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white cursor-pointer appearance-none font-sans"
                         >
-                        <option value="" disabled>Selecione o critério</option>
-                        {CRITERIA.map(c => <option key={c} value={c} className="dark:bg-slate-800">{c}</option>)}
+                            <option value="" disabled>Selecione...</option>
+                            {CRITERIA.map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-500">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                             <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
                         </div>
                     </div>
                 </div>
             </div>
             )}
 
-            {/* STEP 3: OBJETO */}
+            {/* STEP 3 */}
             {currentStep === 3 && (
-            <div className="space-y-6 animate-slideUp">
-                <div className={`group flex flex-col h-full transition-all duration-300 ${focusedField === 'object' ? 'transform scale-[1.01]' : ''}`}>
-                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Objeto da Licitação</label>
+            <div className="space-y-5 animate-fadeIn">
+                <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 font-sans">
+                      {isImpugnment ? 'Objeto Impugnado (Resumo)' : isPriceResearch ? 'Itens a Cotar (Seja Específico)' : isAdhesion ? 'Item para Adesão (Carona)' : 'Objeto da Licitação'}
+                    </label>
                     <textarea
                         name="objectDescription"
                         value={formData.objectDescription}
                         onChange={handleChange}
-                        onFocus={() => setFocusedField('object')}
-                        onBlur={() => setFocusedField(null)}
-                        rows={5}
-                        placeholder="Descreva detalhadamente o item, serviço ou obra..."
-                        className="w-full flex-1 p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-500 outline-none resize-none transition-all dark:text-white placeholder-slate-400 font-medium leading-relaxed"
+                        rows={6}
+                        placeholder={
+                            isImpugnment 
+                            ? "Descreva resumidamente o objeto da licitação que está sendo atacado..." 
+                            : isPriceResearch 
+                            ? "IMPORTANTE: Para uma busca no PNCP, seja específico. Ex: 'Notebook Dell i7 16GB' em vez de apenas 'Computador'. Liste os itens e quantidades."
+                            : isAdhesion
+                            ? "Ex: Notebooks i7, Veículos tipo sedan, Mobiliário Escolar. Descreva o objeto que você deseja contratar via adesão."
+                            : "Descreva detalhadamente o item, serviço ou obra..."
+                        }
+                        className="w-full px-4 py-3 bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none transition-all text-slate-900 dark:text-white placeholder-slate-400 font-serif leading-relaxed"
                         autoFocus
                     />
                 </div>
 
-                <div className={`group transition-all duration-300 ${focusedField === 'value' ? 'transform scale-[1.01]' : ''}`}>
-                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Valor Estimado (R$)</label>
+                <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 font-sans">Valor Estimado Total</label>
                     <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">R$</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-bold font-sans">R$</span>
                         <input
                             type="text"
                             name="estimatedValue"
                             value={formData.estimatedValue}
                             onChange={handleChange}
-                            onFocus={() => setFocusedField('value')}
-                            onBlur={() => setFocusedField(null)}
                             placeholder="0,00"
-                            className="w-full h-14 pl-12 pr-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-500 outline-none transition-all dark:text-white placeholder-slate-400 font-medium text-lg"
+                            className="w-full pl-10 pr-4 py-3 bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white placeholder-slate-400 font-sans"
                         />
                     </div>
                 </div>
             </div>
             )}
 
-            {/* STEP 4: DETALHES */}
+            {/* STEP 4 */}
             {currentStep === 4 && (
-            <div className="space-y-6 animate-slideUp">
-                <div className={`group transition-all duration-300 ${focusedField === 'just' ? 'transform scale-[1.01]' : ''}`}>
-                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Justificativa</label>
-                    <textarea
-                        name="justification"
-                        value={formData.justification}
-                        onChange={handleChange}
-                        onFocus={() => setFocusedField('just')}
-                        onBlur={() => setFocusedField(null)}
-                        rows={4}
-                        placeholder="Por que essa contratação é necessária?"
-                        className="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-500 outline-none resize-none transition-all dark:text-white placeholder-slate-400 font-medium leading-relaxed"
-                        autoFocus
-                    />
-                </div>
+            <div className="space-y-5 animate-fadeIn">
+                {isImpugnment ? (
+                   <div>
+                       <label className="block text-sm font-bold text-primary-600 dark:text-primary-400 mb-2 font-sans flex items-center gap-2">
+                           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                           Texto da Impugnação (Copie e Cole)
+                       </label>
+                       <textarea
+                           name="impugnmentText"
+                           value={formData.impugnmentText || ''}
+                           onChange={handleChange}
+                           rows={8}
+                           placeholder="Cole aqui o texto enviado pela empresa com os argumentos da impugnação. O assistente irá analisar e contra-argumentar juridicamente."
+                           className="w-full px-4 py-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/30 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none transition-all text-slate-900 dark:text-white placeholder-slate-400 font-serif leading-relaxed"
+                           autoFocus
+                       />
+                       <p className="text-xs text-slate-500 mt-2">A IA agirá como Advogado do Órgão para defender o edital.</p>
+                   </div>
+                ) : isAdhesion ? (
+                   <div>
+                        <label className="block text-sm font-bold text-blue-600 dark:text-blue-400 mb-2 font-sans flex items-center gap-2">
+                           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                           Detalhes da Ata de Origem
+                        </label>
+                        <textarea
+                           name="justification"
+                           value={formData.justification}
+                           onChange={handleChange}
+                           rows={6}
+                           placeholder="Se você já encontrou uma Ata, informe: Número da Ata, Órgão Gerenciador, Fornecedor e Vigência. &#10;&#10;Se NÃO encontrou, deixe em branco ou descreva 'Preciso de ajuda para buscar', que a IA gerará um guia de busca no PNCP."
+                           className="w-full px-4 py-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-900/30 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none transition-all text-slate-900 dark:text-white placeholder-slate-400 font-serif leading-relaxed"
+                           autoFocus
+                       />
+                       <p className="text-xs text-slate-500 mt-2">O sistema gerará o Estudo de Vantajosidade e os Ofícios de Solicitação.</p>
+                   </div>
+                ) : (
+                    <div>
+                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 font-sans">
+                            {isPriceResearch ? 'Parâmetros de Pesquisa e Fontes' : 'Justificativa da Contratação'}
+                        </label>
+                        <textarea
+                            name="justification"
+                            value={formData.justification}
+                            onChange={handleChange}
+                            rows={4}
+                            placeholder={
+                                isPriceResearch 
+                                ? "Defina a prioridade de fontes (ex: Painel de Preços, Compras Governamentais). Se quiser, especifique regiões para a busca." 
+                                : "Por que essa contratação é necessária para o interesse público?"
+                            }
+                            className="w-full px-4 py-3 bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none transition-all text-slate-900 dark:text-white placeholder-slate-400 font-serif leading-relaxed"
+                            autoFocus
+                        />
+                    </div>
+                )}
 
-                <div className="group">
-                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Informações Adicionais (Opcional)</label>
+                <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 font-sans">Informações Adicionais (Opcional)</label>
                     <textarea
                         name="additionalInfo"
                         value={formData.additionalInfo}
                         onChange={handleChange}
-                        rows={2}
-                        placeholder="Prazos, garantias, etc..."
-                        className="w-full p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-500 outline-none resize-none transition-all dark:text-white placeholder-slate-400 font-medium"
+                        rows={3}
+                        placeholder={isImpugnment ? "Observações específicas para a defesa..." : "Prazos, garantias, ou exigências específicas..."}
+                        className="w-full px-4 py-3 bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none transition-all text-slate-900 dark:text-white placeholder-slate-400 font-serif leading-relaxed"
                     />
                 </div>
             </div>
@@ -256,18 +294,17 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
         </div>
       </div>
 
-      {/* Modern Footer Actions */}
-      <div className="p-6 lg:p-8 bg-white dark:bg-[#15171e] flex gap-4 shrink-0 border-t border-slate-50 dark:border-slate-800/50">
+      {/* Footer Actions */}
+      <div className="p-6 bg-slate-50 dark:bg-navy-800/50 border-t border-slate-200 dark:border-white/5 flex gap-3">
         <button
           onClick={prevStep}
           disabled={currentStep === 1 || isGenerating}
-          className={`px-6 py-4 rounded-xl font-bold transition-all duration-200 text-sm flex items-center gap-2 border border-transparent
+          className={`px-5 py-3 rounded-lg font-bold text-sm transition-colors border border-slate-300 dark:border-navy-700 font-sans
             ${currentStep === 1 || isGenerating 
-              ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed' 
-              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-200 dark:hover:border-slate-700'
+              ? 'text-slate-400 cursor-not-allowed bg-slate-100 dark:bg-navy-900' 
+              : 'text-slate-700 dark:text-slate-200 bg-white dark:bg-navy-800 hover:bg-slate-100 dark:hover:bg-navy-700'
             }`}
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           Voltar
         </button>
 
@@ -275,38 +312,34 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
           <button
             onClick={nextStep}
             disabled={!isStepValid()}
-            className={`flex-1 px-6 py-4 rounded-xl font-bold text-white transition-all duration-200 shadow-xl text-sm flex items-center justify-center gap-2
+            className={`flex-1 px-5 py-3 rounded-lg font-bold text-white text-sm transition-all shadow-md font-sans
               ${!isStepValid()
-                ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed shadow-none'
-                : 'bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 shadow-primary-500/30 hover:scale-[1.01] active:scale-[0.99]'
+                ? 'bg-slate-300 dark:bg-navy-800 cursor-not-allowed text-slate-500'
+                : 'bg-primary-500 hover:bg-primary-600 shadow-primary-500/20'
               }`}
           >
-            Continuar
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            Próximo Passo
           </button>
         ) : (
           <button
             onClick={onSubmit}
             disabled={!isStepValid() || isGenerating}
-            className={`flex-1 px-6 py-4 rounded-xl font-bold text-white transition-all duration-300 flex items-center justify-center gap-2 text-sm
+            className={`flex-1 px-5 py-3 rounded-lg font-bold text-white text-sm transition-all flex items-center justify-center gap-2 shadow-lg font-sans
               ${!isStepValid() || isGenerating
-                ? 'bg-slate-400 dark:bg-slate-800 cursor-not-allowed opacity-70'
-                : 'bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-400 hover:to-secondary-500 hover:scale-[1.02] active:scale-95 shadow-xl shadow-secondary-500/30 ring-1 ring-secondary-400/20'
+                ? 'bg-slate-400 dark:bg-navy-700 cursor-not-allowed'
+                : 'bg-primary-500 hover:bg-primary-600 shadow-primary-500/25 hover:translate-y-[-1px]'
               }`}
           >
             {isGenerating ? (
               <>
-                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <span className="font-display">Gerando Documento...</span>
+                {isImpugnment ? 'Gerar Parecer Jurídico' : isAdhesion ? 'Gerar Pedido de Adesão' : isPriceResearch ? 'Pesquisar Preços no PNCP' : 'Gerar Documento Oficial'}
               </>
             ) : (
-              <>
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                <span className="font-display">Gerar Documento</span>
-              </>
+              isImpugnment ? 'Gerar Resposta à Impugnação' : isAdhesion ? 'Gerar Pedido de Adesão' : isPriceResearch ? 'Pesquisar Preços no PNCP' : 'Gerar Documento Oficial'
             )}
           </button>
         )}

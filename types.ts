@@ -4,6 +4,8 @@ export enum DocumentType {
   TR = 'Termo de Referência',
   PESQUISA_PRECO = 'Modelo de Pesquisa de Preço',
   VIABILIDADE = 'Estudo de Viabilidade',
+  IMPUGNACAO = 'Resposta à Impugnação',
+  ADESAO_ATA = 'Adesão à Ata (Carona)',
 }
 
 export interface FormData {
@@ -15,6 +17,7 @@ export interface FormData {
   estimatedValue: string;
   justification: string;
   additionalInfo: string;
+  impugnmentText?: string; // New field for the company's argument
 }
 
 export interface Message {

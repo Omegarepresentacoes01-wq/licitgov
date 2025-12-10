@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, Component, ReactNode, ErrorInfo } from 'react';
+import React, { useState, useCallback, useEffect, ReactNode, ErrorInfo } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { InputForm } from './components/InputForm';
 import { ResultViewer } from './components/ResultViewer';
@@ -9,7 +9,7 @@ import { generateDocumentStream } from './services/geminiService';
 import { getCurrentUser, logout, saveDocument } from './services/mockBackend';
 
 interface ErrorBoundaryProps {
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 interface ErrorBoundaryState {
@@ -18,14 +18,11 @@ interface ErrorBoundaryState {
 }
 
 // Error Boundary para evitar tela branca completa em produção
-class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
-    super(props);
-    this.state = {
-      hasError: false,
-      error: null
-    };
-  }
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  state: ErrorBoundaryState = {
+    hasError: false,
+    error: null
+  };
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
@@ -38,8 +35,8 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-4 font-sans text-slate-800 dark:text-white">
-          <div className="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl max-w-lg w-full border border-red-100 dark:border-red-900/30">
+        <div className="min-h-screen flex items-center justify-center bg-navy-brand p-4 font-sans text-slate-800 dark:text-white">
+          <div className="bg-white dark:bg-navy-surface p-8 rounded-2xl shadow-xl max-w-lg w-full border border-red-100 dark:border-red-900/30">
             <div className="w-16 h-16 bg-red-100 dark:bg-red-900/50 rounded-full flex items-center justify-center mb-6 mx-auto">
                 <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -49,7 +46,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             <p className="text-center text-slate-600 dark:text-slate-400 mb-6">
                 Ocorreu um erro inesperado na aplicação. Isso geralmente ocorre por configuração de ambiente incompleta.
             </p>
-            <div className="bg-slate-100 dark:bg-slate-950 p-4 rounded-lg text-xs font-mono overflow-auto mb-6 border border-slate-200 dark:border-slate-800 max-h-40">
+            <div className="bg-slate-100 dark:bg-navy-900 p-4 rounded-lg text-xs font-mono overflow-auto mb-6 border border-slate-200 dark:border-navy-700 max-h-40">
               {this.state.error?.toString()}
             </div>
             <button 
@@ -113,7 +110,8 @@ const AppContent: React.FC = () => {
     objectDescription: '',
     estimatedValue: '',
     justification: '',
-    additionalInfo: ''
+    additionalInfo: '',
+    impugnmentText: ''
   });
 
   const [genState, setGenState] = useState<GenerationState>({
@@ -127,6 +125,10 @@ const AppContent: React.FC = () => {
     setFullGeneratedText('');
     setGenState({ isGenerating: false, error: null });
     setIsSidebarOpen(false); // Close sidebar on mobile selection
+    // Reset specific fields when switching
+    if (doc === DocumentType.IMPUGNACAO) {
+        setFormData(prev => ({ ...prev, objectDescription: '', impugnmentText: '' }));
+    }
   };
 
   const handleGenerate = useCallback(async () => {
@@ -174,7 +176,6 @@ const AppContent: React.FC = () => {
 
   const handleLoginSuccess = (user: User) => {
     setCurrentUser(user);
-    // If admin, redirect to admin dash first? No, let's go to app and offer dash link.
     setView('app');
   };
 
@@ -182,7 +183,6 @@ const AppContent: React.FC = () => {
     logout();
     setCurrentUser(null);
     setView('login');
-    // Reset forms
     setOutputContent('');
     setFormData({ ...formData, objectDescription: '', estimatedValue: '', justification: '' });
   };
@@ -197,9 +197,9 @@ const AppContent: React.FC = () => {
     return <AdminDashboard currentUser={currentUser} onExit={() => setView('app')} />;
   }
 
-  // MAIN APP VIEW
+  // MAIN APP VIEW - Updated background
   return (
-    <div className="flex flex-col lg:flex-row h-screen w-full overflow-hidden bg-slate-50 dark:bg-[#0b0c10] transition-colors duration-300">
+    <div className="flex flex-col lg:flex-row h-screen w-full overflow-hidden bg-slate-50 dark:bg-navy-900 transition-colors duration-300">
       
       {/* Mobile Sidebar Overlay */}
       <Sidebar 
@@ -216,25 +216,26 @@ const AppContent: React.FC = () => {
       />
       
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
-        {/* Header decoration */}
-        <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-primary-100/20 to-transparent dark:from-primary-900/5 pointer-events-none z-0"></div>
+        {/* Header decoration - subtle gradient */}
+        <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-slate-200 to-transparent dark:from-navy-800 pointer-events-none z-0"></div>
 
-        {/* Mobile Header */}
-        <header className="px-4 py-3 lg:px-6 lg:py-4 shrink-0 flex justify-between items-center z-10 border-b lg:border-none border-slate-200 dark:border-slate-800 bg-white lg:bg-transparent dark:bg-[#15171e] lg:dark:bg-transparent">
+        {/* Mobile Header com Botão Hambúrguer */}
+        <header className="px-4 py-4 lg:px-8 lg:py-6 shrink-0 flex justify-between items-center z-10 border-b lg:border-none border-slate-200 dark:border-white/5 bg-white lg:bg-transparent dark:bg-navy-900 lg:dark:bg-transparent">
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setIsSidebarOpen(true)}
-              className="lg:hidden p-2 -ml-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
+              className="lg:hidden p-2 -ml-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-navy-800 rounded-lg transition-colors"
+              aria-label="Abrir menu"
             >
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
             <div>
-              <h2 className="text-xl lg:text-2xl font-bold text-slate-800 dark:text-white tracking-tight truncate max-w-[200px] sm:max-w-md">
-                {selectedDoc}
+              <h2 className="text-xl lg:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight truncate max-w-[200px] sm:max-w-md">
+                {selectedDoc.split('(')[0]}
               </h2>
-              <p className="text-xs lg:text-sm text-slate-500 dark:text-slate-400 hidden sm:block">Ambiente Seguro &bull; Dados Isolados</p>
+              <p className="text-xs lg:text-sm text-slate-500 dark:text-slate-400 hidden sm:block font-medium mt-0.5">Ambiente Seguro &bull; Dados Isolados</p>
             </div>
           </div>
           
@@ -250,14 +251,15 @@ const AppContent: React.FC = () => {
           )}
         </header>
 
-        <div className="flex-1 flex flex-col lg:flex-row px-4 lg:px-6 pb-6 gap-4 lg:gap-6 overflow-hidden z-10">
+        <div className="flex-1 flex flex-col lg:flex-row px-4 lg:px-8 pb-6 gap-6 overflow-hidden z-10">
           {/* Left Panel: Inputs */}
-          <div className="w-full lg:w-1/3 lg:min-w-[400px] h-1/2 lg:h-full transition-all flex flex-col order-1">
+          <div className="w-full lg:w-1/3 lg:min-w-[420px] h-1/2 lg:h-full transition-all flex flex-col order-1">
             <InputForm 
               formData={formData} 
               onChange={setFormData} 
               onSubmit={handleGenerate}
               isGenerating={genState.isGenerating}
+              selectedDoc={selectedDoc}
             />
           </div>
 

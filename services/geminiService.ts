@@ -11,35 +11,33 @@ export const generateDocumentStream = async (
 ) => {
   const modelId = 'gemini-3-pro-preview';
 
+  // Wrapper que reforça a persona e a necessidade de citações a cada execução
   const userPrompt = `
-    ATENÇÃO MÁXIMA: GERAÇÃO DE DOCUMENTO JURÍDICO OFICIAL.
-    
-    PERFIL DO REDATOR: Auditor Federal de Controle Externo e Especialista em Licitações.
-    MISSÃO: Produzir um documento à prova de falhas, auditável e tecnicamente perfeito.
-    
     DADOS DO PROCESSO ADMINISTRATIVO:
     -----------------------------------
     ÓRGÃO: ${data.organName}
-    LOCAL: ${data.city}
-    OBJETO DA CONTRATAÇÃO: ${data.objectDescription}
-    VALOR ESTIMADO: ${data.estimatedValue}
+    CIDADE/UF: ${data.city}
     MODALIDADE: ${data.modality}
-    CRITÉRIO DE JULGAMENTO: ${data.judgmentCriteria}
-    JUSTIFICATIVA: ${data.justification}
+    CRITÉRIO: ${data.judgmentCriteria}
+    OBJETO: ${data.objectDescription}
+    VALOR ESTIMADO: ${data.estimatedValue}
+    JUSTIFICATIVA INICIAL: ${data.justification}
     OBSERVAÇÕES: ${data.additionalInfo}
+    ${data.impugnmentText ? `\n--- TEXTO DA IMPUGNAÇÃO RECEBIDA: ---\n${data.impugnmentText}\n------------------` : ''}
     -----------------------------------
 
-    DOCUMENTO A SER GERADO: ${docType}
+    COMANDO DE EXECUÇÃO:
+    Atue como Consultor Jurídico Sênior. Redija o documento: **${docType}**.
     
-    INSTRUÇÕES ESTRUTURAIS ESPECÍFICAS:
-    ${PROMPT_TEMPLATES[docType]}
+    DIRETRIZES ESTRUTURAIS CRÍTICAS:
+    1.  **JURISPRUDÊNCIA:** O documento DEVE conter citações diretas ou indiretas de Acórdãos do TCU, Súmulas ou entendimentos doutrinários relevantes ao objeto.
+    2.  **BASE LEGAL:** Cite exaustivamente a Lei 14.133/2021 (Artigos, incisos).
+    3.  **EXTENSÃO:** Escreva parágrafos longos, bem fundamentados e conectados. Nada de textos curtos ou superficiais.
+    4.  **PROPRIEDADE:** Use termos como "Vantajosidade", "Economicidade", "Isonomia", "Vinculação ao Instrumento Convocatório".
+    5.  **LINKS E FONTES:** Para pesquisas de preço ou adesões, é OBRIGATÓRIO fornecer o LINK da fonte consultada para transparência.
 
-    REGRAS DE FORMATAÇÃO E ESTILO:
-    1. Use Markdown profissional.
-    2. CITE A LEI: Sempre que afirmar uma obrigação ou direito, coloque "(conforme Art. X, Lei 14.133/21)".
-    3. NÃO RESUMA: Escreva todas as cláusulas por extenso.
-    4. Use linguagem clara, direta, mas formal.
-    5. Destaque prazos, valores e obrigações críticas em **negrito**.
+    DETALHES ESPECÍFICOS DO TIPO DOCUMENTAL:
+    ${PROMPT_TEMPLATES[docType]}
   `;
 
   try {
@@ -48,9 +46,11 @@ export const generateDocumentStream = async (
       contents: userPrompt,
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
-        temperature: 0.4,
-        topP: 0.95,
+        temperature: 0.3, // Baixa temperatura para maior rigor técnico e factualidade
+        topP: 0.8,
         topK: 40,
+        // Habilita busca no Google para encontrar preços reais e links no PNCP
+        tools: [{ googleSearch: {} }],
       }
     });
 

@@ -1,218 +1,271 @@
 import { DocumentType } from './types';
 
 export const SYSTEM_INSTRUCTION = `
-Você é o "LicitGov AI", a maior autoridade em Direito Administrativo e Licitações Públicas do Brasil.
-Sua persona é a de um Procurador Jurídico Sênior e Auditor do Tribunal de Contas (TCU) com 30 anos de experiência.
+Você é o "LicitGov AI", a autoridade máxima em Direito Administrativo e Licitações Públicas do Brasil.
+Sua persona é a de um Procurador Jurídico Sênior e Auditor do Tribunal de Contas da União (TCU) com vasta experiência em Controle Externo.
 
-OBJETIVO FINAL:
-Gerar documentos administrativos com "Blindagem Jurídica". O texto deve ser tão robusto, detalhado e fundamentado que nenhum órgão de controle (TCE/TCU) possa apontar falhas ou omissões.
+OBJETIVO IMUTÁVEL:
+Gerar peças jurídicas e administrativas EXTENSAS, ROBUSTAS e "BLINDADAS". O documento deve resistir ao escrutínio de qualquer Tribunal de Contas (TCE/TCU) ou Ministério Público.
 
-DIRETRIZES DE ESCRITA (ALTA RIGOROSIDADE):
-1.  **EXAUSTIVIDADE:** Nunca economize palavras. Se um tópico exige 3 páginas de explicação técnica, escreva 3 páginas. O documento deve ser longo, detalhado e denso.
-2.  **FUNDAMENTAÇÃO LEGAL:** Para cada afirmação, decisão ou critério adotado, você DEVE citar o Artigo, Inciso e Parágrafo correspondente da Lei 14.133/2021, ou Súmulas do TCU quando aplicável.
-3.  **PROFUNDIDADE TÉCNICA:** Não use frases genéricas como "conforme a lei". Especifique "conforme o Art. 18, §1º, inciso III da Lei 14.133/2021".
-4.  **SEM RESUMOS:** É estritamente proibido resumir, usar reticências (...) ou placeholders. Escreva o conteúdo real e final.
-5.  **ESTILO:** Formal, culto, impessoal e técnico.
+REGRAS DE OURO (OBRIGATÓRIAS):
 
-SUA REPUTAÇÃO ESTÁ EM JOGO. ERROS OU OMISSÕES SÃO INACEITÁVEIS.
+1.  **EXTENSÃO E PROFUNDIDADE:**
+    - É PROIBIDO ser sucinto. Seus textos devem ser longos, analíticos e detalhados.
+    - Evite listas simples (bullet points) sem explicação. Cada tópico deve ter parágrafos de fundamentação teórica e prática.
+
+2.  **FUNDAMENTAÇÃO LEGAL EXAUSTIVA:**
+    - NUNCA faça uma afirmação sem citar a base legal.
+    - Base Primária: Lei nº 14.133/2021 (Nova Lei de Licitações). Cite Artigo, Inciso e Parágrafo.
+    - Base Secundária: Constituição Federal (Art. 37), Instruções Normativas (SEGES/ME), Decretos Federais.
+
+3.  **JURISPRUDÊNCIA E DOUTRINA (O DIFERENCIAL):**
+    - Você DEVE citar entendimentos consolidados. Use expressões como:
+      - "Conforme entendimento pacificado no Acórdão TCU nº..."
+      - "Segundo a Súmula nº X do TCU..."
+      - "Seguindo a orientação do STF no RE..."
+      - "A doutrina de Marçal Justen Filho/Hely Lopes Meirelles ensina que..."
+    - Se não houver um número de acórdão específico em sua base para o caso exato, cite o *entendimento* consolidado da Corte ("Conforme jurisprudência remansosa do TCU sobre o tema...").
+
+4.  **ESTILO DE REDAÇÃO:**
+    - Formal, culto, impessoal, técnico-jurídico.
+    - Use conectivos robustos ("Nessa senda", "Compulsando os autos", "Imperioso destacar", "Sob a égide da Lei 14.133/21").
+
+5.  **ESTRUTURA:**
+    - Todo documento deve ter Introdução, Fundamentação Legal, Análise Fática, Jurisprudence Aplicável e Conclusão.
+
+SUA REPUTAÇÃO DEPENDE DA TECNICIDADE E DO RESPALDO JURÍDICO DO TEXTO GERADO.
 `;
 
 export const PROMPT_TEMPLATES: Record<DocumentType, string> = {
   [DocumentType.ETP]: `
-    Elabore um ESTUDO TÉCNICO PRELIMINAR (ETP) DIGITAL DE ALTA COMPLEXIDADE, em estrita conformidade com o Art. 18 da Lei nº 14.133/2021 e IN SEGES/ME nº 58/2022.
+    Elabore um ESTUDO TÉCNICO PRELIMINAR (ETP) COMPLEXO E DETALHADO.
+    Base Legal: Art. 18 da Lei nº 14.133/2021 e IN SEGES/ME nº 58/2022.
 
-    O documento deve ser extremamente detalhado, contendo obrigatoriamente os seguintes elementos, desenvolvidos com profundidade argumentativa:
+    O documento deve ser extenso. Para cada um dos tópicos abaixo, escreva parágrafos densos fundamentando a decisão:
 
-    1.  **DESCRIÇÃO DA NECESSIDADE DA CONTRATAÇÃO (Art. 18, I):**
-        - Descreva o problema público de forma analítica.
-        - Vincule a necessidade ao interesse público e à missão institucional do órgão.
-        - Cite a obrigatoriedade da continuidade do serviço público.
+    1.  **DESCRIÇÃO DA NECESSIDADE (Art. 18, I):**
+        - Contextualize a necessidade pública. Não diga apenas "precisamos comprar". Explique o impacto social e administrativo.
+        - Cite o Princípio da Continuidade do Serviço Público.
 
-    2.  **PREVISÃO NO PLANO DE CONTRATAÇÕES ANUAL (Art. 18, II):**
-        - Verifique e declare o alinhamento com o planejamento estratégico. Caso não conste, justifique juridicamente a inclusão extemporânea.
+    2.  **ALINHAMENTO AO PLANEJAMENTO (Art. 18, II):**
+        - Discorra sobre a governança das contratações e o Plano de Contratações Anual (PCA).
 
     3.  **REQUISITOS DA CONTRATAÇÃO (Art. 18, III):**
-        - Liste requisitos técnicos, legais, de segurança, de sustentabilidade (PLS) e de manutenção.
-        - Justifique cada requisito com base na eficiência e na isonomia.
+        - Defina requisitos técnicos, de sustentabilidade (PLS) e de manutenção.
+        - **JURISPRUDÊNCIA:** Cite acórdãos do TCU que proíbem requisitos restritivos que frustrem a competitividade (Súmula 247 TCU).
 
     4.  **ESTIMATIVA DAS QUANTIDADES (Art. 18, IV):**
-        - APRESENTE MEMÓRIA DE CÁLCULO DETALHADA. Não lance apenas números. Explique a metodologia de cálculo (consumo histórico, projeção de demanda, benchmarks).
+        - Apresente memória de cálculo detalhada.
+        - Justifique que a quantidade não é aleatória, para evitar o risco de "Jogo de Planilha".
 
     5.  **LEVANTAMENTO DE MERCADO E ALTERNATIVAS (Art. 18, V):**
-        - Compare diferentes soluções possíveis (ex: Comprar vs Locar, Software A vs B).
-        - Justifique tecnicamente e economicamente a escolha da solução final.
+        - Compare cenários (Solução A x Solução B).
+        - Faça uma análise de Custo-Benefício.
 
-    6.  **ESTIMATIVA DO VALOR DA CONTRATAÇÃO (Art. 18, VI):**
-        - Descreva a metodologia de pesquisa de preços que será utilizada (Painel de Preços, Média, Mediana), citando a IN 65/2021.
+    6.  **ESTIMATIVA DO VALOR (Art. 18, VI):**
+        - Cite a IN 65/2021.
+        - Explique a metodologia da "Cesta de Preços Aceitáveis" para evitar sobrepreço.
 
-    7.  **DESCRIÇÃO DA SOLUÇÃO COMO UM TODO (Art. 18, VII):**
-        - Ciclo de vida do produto, assistência técnica, garantia, logística reversa.
+    7.  **DESCRIÇÃO DA SOLUÇÃO (Art. 18, VII):**
+        - Detalhe a solução completa (entrega, garantia, suporte).
 
-    8.  **JUSTIFICATIVA PARA O PARCELAMENTO OU NÃO (Art. 18, VIII):**
-        - Aplique a Súmula 247 do TCU. A regra é parcelar. Se não parcelar, justifique a inviabilidade técnica ou econômica de forma robusta.
+    8.  **PARCELAMENTO DO OBJETO (Art. 18, VIII):**
+        - Tópico Crítico. A regra é parcelar (Súmula 247 TCU).
+        - Se for em lote único, construa uma defesa jurídica robusta alegando perda de economia de escala ou risco técnico, citando precedentes.
 
     9.  **RESULTADOS PRETENDIDOS (Art. 18, IX):**
-        - Liste métricas de economicidade, eficácia e eficiência esperadas.
+        - Eficácia, Eficiência e Economicidade.
 
     10. **PROVIDÊNCIAS PRÉVIAS (Art. 18, X):**
-        - O que o órgão precisa fazer antes do contrato iniciar? (Adequação de rede elétrica, espaço físico, nomeação de fiscais).
+        - Mapeamento de riscos preliminar.
 
-    11. **CONTRATAÇÕES CORRELATAS E INTERDEPENDENTES (Art. 18, XI).**
+    11. **VIABILIDADE (Art. 18, §1º):**
+        - Conclusão robusta declarando a viabilidade técnica e econômica.
 
-    12. **IMPACTOS AMBIENTAIS (Art. 18, XII):**
-        - Análise detalhada de sustentabilidade e mitigação de danos.
-
-    13. **POSICIONAMENTO CONCLUSIVO SOBRE A VIABILIDADE (Art. 18, §1º):**
-        - Declaração formal e fundamentada de que a contratação é VIÁVEL e atende ao INTERESSE PÚBLICO.
-
-    GERE UM DOCUMENTO LONGO E COMPLETO, DIGNO DE UMA AUDITORIA.
+    O TEXTO DEVE SER LONGO, PARECENDO UM LAUDO DE AUDITORIA.
   `,
 
   [DocumentType.MAPA_RISCO]: `
-    Elabore um MATRIZ DE GERENCIAMENTO DE RISCOS completa e detalhada, baseada na ISO 31000 e nas orientações do TCU.
+    Elabore uma MATRIZ DE GERENCIAMENTO DE RISCOS EXAUSTIVA.
+    Referência: ISO 31000 e Instruções do Tribunal de Contas da União (TCU).
 
-    Para cada fase abaixo, identifique MINIMAMENTE 5 (cinco) riscos específicos e técnicos (não use riscos genéricos). Para cada risco, detalhe:
+    Não se limite a uma tabela simples. Para cada risco, faça uma breve análise qualitativa antes de definir os parâmetros.
 
-    ESTRUTURA PARA CADA RISCO:
-    a) **Evento de Risco**: Descrição clara do que pode acontecer.
-    b) **Causa**: O que provoca esse risco?
-    c) **Consequência**: Impacto no resultado da licitação ou contrato.
-    d) **Probabilidade**: (Baixa / Média / Alta) - Justifique.
-    e) **Impacto**: (Baixo / Médio / Alto) - Justifique.
-    f) **Nível de Risco**: (Cálculo Probabilidade x Impacto).
-    g) **Tratamento/Resposta**: (Mitigar, Evitar, Transferir, Aceitar).
-    h) **Ações de Controle (Preventivas)**: O que fazer para não acontecer?
-    i) **Ações de Contingência (Corretivas)**: O que fazer se acontecer?
-    j) **Responsável**: Cargo/Setor responsável.
+    FASES A COBRIR (Mínimo 6 riscos detalhados por fase):
 
-    FASES OBRIGATÓRIAS:
-    1.  **RISCOS NA FASE DE PLANEJAMENTO (ETP/TR):**
-        - Ex: Especificação restritiva, superestimativa de preços, deficiência na definição do objeto.
-    2.  **RISCOS NA FASE DE SELEÇÃO DO FORNECEDOR (LICITAÇÃO):**
-        - Ex: Licitação deserta, propostas inexequíveis, conluio, recursos protelatórios.
-    3.  **RISCOS NA FASE DE GESTÃO CONTRATUAL:**
-        - Ex: Inexecução total/parcial, entrega de material de baixa qualidade, falência da contratada, falha na fiscalização.
+    1.  **PLANEJAMENTO:**
+        - Riscos de especificação deficiente (direcionamento, restrição indevida).
+        - Riscos de orçamentação inadequada (sobrepreço, inexequibilidade).
+        - Cite a responsabilidade dos agentes de planejamento (Art. 18 da Lei 14.133).
 
-    O documento deve demonstrar ao órgão de controle que a administração previu todos os cenários adversos possíveis.
+    2.  **SELEÇÃO DO FORNECEDOR:**
+        - Risco de licitação deserta ou fracassada.
+        - Risco de propostas em conluio (Cartel).
+        - Risco de judicialização.
+
+    3.  **EXECUÇÃO CONTRATUAL:**
+        - Risco de inexecução total ou parcial.
+        - Risco de pleitos de reequilíbrio econômico-financeiro (álea extraordinária).
+        - Falha na fiscalização (Culpa in vigilando da Administração).
+
+    PARA CADA RISCO, DETALHE:
+    - Evento, Causa e Consequência.
+    - Probabilidade e Impacto (Justifique a nota atribuída).
+    - Nível de Risco (Matriz de Gutierrez).
+    - Ações de Tratamento (Mitigar, Transferir, Aceitar, Evitar).
+    - **Plano de Contingência:** O que fazer se o risco virar realidade.
+
+    Use terminologia técnica de auditoria de riscos.
   `,
 
   [DocumentType.TR]: `
-    Elabore um TERMO DE REFERÊNCIA (TR) EXTREMAMENTE ROBUSTO, em conformidade total com o Art. 6º, XXIII da Lei 14.133/2021.
-    Este documento servirá de base para o Edital e o Contrato, portanto, deve ser impecável.
+    Elabore um TERMO DE REFERÊNCIA (TR) JURIDICAMENTE PERFEITO.
+    Base: Art. 6º, XXIII da Lei 14.133/2021.
 
-    ESTRUTURA OBRIGATÓRIA E DETALHADA:
+    O documento deve ser redigido para evitar impugnações e garantir a segurança jurídica do Gestor.
+
+    TÓPICOS OBRIGATÓRIOS E DETALHADOS:
 
     1.  **DEFINIÇÃO DO OBJETO:**
-        - Descrição minuciosa, clara e precisa. Vedada especificação que direcione marca (salvo padronização justificada).
+        - Precisa e suficiente (Súmula 177 TCU). Vedação à marca (salvo padronização - Art. 41).
 
-    2.  **FUNDAMENTAÇÃO DA CONTRATAÇÃO:**
-        - Referência direta ao ETP e à necessidade pública.
+    2.  **JUSTIFICATIVA TÉCNICA:**
+        - Replique a necessidade do ETP, reforçando o interesse público primário.
 
-    3.  **DESCRIÇÃO DA SOLUÇÃO COMO UM TODO:**
-        - Especificações técnicas detalhadas, normas ABNT aplicáveis, ISOs exigidas.
+    3.  **MODELO DE EXECUÇÃO E GESTÃO (SLA):**
+        - Estabeleça o Acordo de Nível de Serviço (SLA).
+        - Defina métricas objetivas de qualidade (Art. 88, §3º). O pagamento deve ser vinculado a resultados (Glosa por ineficiência).
 
-    4.  **REQUISITOS DA CONTRATAÇÃO:**
-        - Garantia da proposta e garantia contratual (Art. 96).
-        - Experiência mínima e capacidade técnica operacional/profissional.
+    4.  **DA HABILITAÇÃO E QUALIFICAÇÃO:**
+        - Habilitação Jurídica, Fiscal, Social, Trabalhista.
+        - **Qualificação Técnica (Ponto Sensível):** Defina exigências de capacidade técnico-operacional e profissional.
+        - **JURISPRUDÊNCIA:** Cite que as exigências devem ser proporcionais e indispensáveis ao cumprimento da obrigação (Art. 37, XXI, CF/88 e Acórdãos do TCU), para não restringir o caráter competitivo.
 
-    5.  **MODELO DE EXECUÇÃO DO OBJETO (SLA - ACORDO DE NÍVEL DE SERVIÇO):**
-        - Prazos de entrega/execução (cronograma físico-financeiro detalhado).
-        - Local, horários e condições de recebimento.
-        - Definição de níveis mínimos de qualidade aceitáveis.
+    5.  **ESTIMATIVA DE PREÇOS:**
+        - Referência ao Sigilo do Orçamento (se adotado - Art. 24).
 
-    6.  **MODELO DE GESTÃO DO CONTRATO (Art. 117):**
-        - Atribuições detalhadas do Gestor do Contrato e dos Fiscais (Técnico, Administrativo, Setorial).
-        - Procedimentos de fiscalização e rotinas de acompanhamento.
+    6.  **SANÇÕES ADMINISTRATIVAS:**
+        - Detalhe o processo administrativo sancionador (Art. 156).
+        - Diferencie a aplicação de Advertência, Multa e Declaração de Inidoneidade.
+        - Cite o respeito ao Contraditório e Ampla Defesa.
 
-    7.  **CRITÉRIOS DE MEDIÇÃO E PAGAMENTO (Art. 141):**
-        - Vinculação do pagamento ao desempenho (se cabível).
-        - Prazo de pagamento (Art. 143).
-        - Documentação exigida para Nota Fiscal.
+    7.  **CRITÉRIOS DE PAGAMENTO:**
+        - Cronograma físico-financeiro e regras de liquidação da despesa.
 
-    8.  **FORMA E CRITÉRIOS DE SELEÇÃO DO FORNECEDOR:**
-        - Modalidade, critério de julgamento e modo de disputa.
-        - Exigências de Habilitação (Jurídica, Fiscal, Social, Trabalhista, Técnica, Econômica) - Cite os artigos 62 a 70 da Lei 14.133.
-
-    9.  **ESTIMATIVA DO VALOR DA CONTRATAÇÃO:**
-        - Valor máximo aceitável e sigilo do orçamento (se aplicável).
-
-    10. **ADEQUAÇÃO ORÇAMENTÁRIA:**
-        - Indicação da dotação orçamentária.
-
-    11. **INFRAÇÕES E SANÇÕES ADMINISTRATIVAS (Art. 155 e 156):**
-        - Liste detalhadamente as condutas infracionais e as penas (Advertência, Multa, Impedimento, Declaração de Inidoneidade).
-        - Estipule os percentuais de multa moratória e compensatória.
-
-    Escreva cada item com precisão cirúrgica para evitar impugnações.
+    GERE UM DOCUMENTO EXTENSO, COM CLÁUSULAS BEM REDIGIDAS E EXPLICADAS.
   `,
 
   [DocumentType.PESQUISA_PRECO]: `
-    Elabore um DOCUMENTO TÉCNICO DE PESQUISA DE PREÇOS E ORÇAMENTO ESTIMADO, conforme Art. 23 da Lei 14.133/2021 e IN 65/2021.
+    Elabore um RELATÓRIO ANALÍTICO DE PESQUISA DE PREÇOS COM FONTES REAIS (PNCP).
+    Base Rigorosa: Art. 23 da Lei nº 14.133/2021 e IN SEGES/ME nº 65/2021.
 
-    O documento deve blindar o processo contra acusações de sobrepreço ou subpreço.
+    **COMANDO DE BUSCA (Grounding):** Utilize a ferramenta de busca para encontrar preços recentes praticados na Administração Pública (PNCP) para o objeto descrito.
 
-    CONTEÚDO OBRIGATÓRIO:
+    ESTRUTURA OBRIGATÓRIA:
 
-    1.  **IDENTIFICAÇÃO DO OBJETO ORÇADO:**
-        - Especificação exata utilizada na cotação.
+    1.  **QUADRO DE RESULTADOS DA PESQUISA (Use Markdown Table):**
+        - Crie uma tabela com as colunas: **Descrição do Item**, **Preço Unitário (R$)**, **Órgão Gerenciador/Comprador**, **Data da Compra**, **UASG** e **LINK DA FONTE**.
+        - É CRUCIAL que você liste o **Nome do Órgão** que registrou o preço e o **Link (URL)** para garantir a transparência e auditoria.
 
-    2.  **PARÂMETROS E FONTES DE PESQUISA (Art. 23, §1º):**
-        - Priorize e descreva o uso do PNCP (Portal Nacional de Contratações Públicas).
-        - Contratações similares de outros entes (comprovando similaridade).
-        - Mídia especializada e sítios eletrônicos.
-        - Pesquisa direta com no mínimo 3 (três) fornecedores (último recurso).
-        - Justifique a escolha das fontes.
+    2.  **METODOLOGIA (A "CESTA DE PREÇOS"):**
+        - Cite a prioridade legal das fontes (PNCP > Contratações Similares > Mídia > Fornecedores).
+        - Explique que a pesquisa priorizou o Painel de Preços e o PNCP conforme Art. 23, §1º.
 
-    3.  **DATA BASE E VALIDADE DAS PROPOSTAS:**
-        - Defina o período da pesquisa (máximo 6 meses ou conforme regra local).
+    3.  **TRATAMENTO ESTATÍSTICO:**
+        - Aplique o cálculo do Coeficiente de Variação (CV). Se encontrar preços muito díspares, sugira o expurgo dos outliers.
+        - Cite a IN 65/2021 sobre a metodologia da Média ou Mediana.
 
-    4.  **TRATAMENTO DOS DADOS (CRITICIDADE):**
-        - Metodologia de Expurgo: Explique como valores inexequíveis ou excessivamente elevados foram descartados (Coeficiente de Variação).
+    4.  **CONCLUSÃO DO PREÇO ESTIMADO:**
+        - Defina o valor unitário de referência com base na média saneada ou mediana.
+        - Certifique a compatibilidade com o mercado.
 
-    5.  **DEFINIÇÃO DO VALOR ESTIMADO:**
-        - Justifique tecnicamente a escolha entre:
-          a) MENOR PREÇO (Justificar por que não traz risco à qualidade).
-          b) MÉDIA SANEADA (Padrão mais aceito).
-          c) MEDIANA (Para evitar distorções de extremos).
-        - Apresente a memória de cálculo simulada.
-
-    6.  **CERTIFICAÇÃO DE COMPATIBILIDADE:**
-        - Declaração de que os preços estão compatíveis com o mercado.
-
-    7.  **MATRIZ DE RISCO ORÇAMENTÁRIO:**
-        - Riscos de variação cambial, inflação setorial, etc.
-
-    Seja extremamente técnico na metodologia estatística.
+    **ATENÇÃO:** Se a busca online não retornar resultados exatos, use preços estimados de mercado mas MANTENHA A ESTRUTURA DA TABELA indicando onde o gestor deve inserir os links reais.
   `,
 
   [DocumentType.VIABILIDADE]: `
-    Elabore um ESTUDO TÉCNICO DE VIABILIDADE (Antecedente ao ETP em projetos complexos).
-    Foco: Análise de Custo-Benefício e Soluções de Mercado para grandes contratações.
+    Elabore um ESTUDO TÉCNICO DE VIABILIDADE (ANTEPROJETO) ROBUSTO.
+    Foco: Grandes contratações, obras ou serviços continuados complexos.
 
-    DESENVOLVA:
-    1.  **ANÁLISE DAS ALTERNATIVAS POSSÍVEIS:**
-        - Descreva pelo menos 3 cenários de solução para o problema.
-        - Ex: Cenário A (Compra), Cenário B (Locação), Cenário C (Desenvolvimento Interno).
+    1.  **ANÁLISE DE NECESSIDADE SOB A ÓTICA DO INTERESSE PÚBLICO:**
+        - Diagnóstico do problema atual.
 
-    2.  **VIABILIDADE TÉCNICA:**
-        - O mercado dispõe de tecnologia madura? Há fornecedores suficientes para garantir competição?
+    2.  **COMPARAÇÃO DE SOLUÇÕES DE MERCADO (Benchmarking):**
+        - Analise Soluções A, B e C.
+        - Para cada uma, avalie: Tecnologia, Disponibilidade, Custo de Implantação e Manutenção.
 
-    3.  **VIABILIDADE ECONÔMICA (TCO - Total Cost of Ownership):**
-        - Não analise apenas o preço de compra. Analise:
-          - Custo de aquisição.
-          - Custo de instalação/treinamento.
-          - Custo de operação (energia, insumos).
-          - Custo de manutenção (peças, suporte).
-          - Custo de descarte (fim de vida útil).
-        - Compare o TCO dos cenários.
+    3.  **ANÁLISE DE TCO (CUSTO TOTAL DE PROPRIEDADE):**
+        - Não considere apenas o menor preço inicial.
+        - Considere vida útil, depreciação, custo de operação.
+        - Cite que a Lei 14.133/21 privilegia a vantajosidade ao longo do ciclo de vida (Art. 11).
 
-    4.  **VIABILIDADE JURÍDICA:**
-        - Há vedação legal para alguma das soluções? Há riscos de questionamento judicial?
+    4.  **MATRIZ DE RISCOS PRELIMINAR:**
+        - Riscos políticos, econômicos e tecnológicos.
 
-    5.  **VIABILIDADE AMBIENTAL:**
-        - Qual solução gera menor impacto ambiental?
+    5.  **PARECER CONCLUSIVO:**
+        - Indique a solução escolhida fundamentando na Eficiência (Art. 37 CF/88).
+  `,
 
-    6.  **CONCLUSÃO E RECOMENDAÇÃO:**
-        - Indique a solução mais vantajosa para a Administração Pública com base em dados objetivos.
+  [DocumentType.IMPUGNACAO]: `
+    Elabore um PARECER JURÍDICO DE RESPOSTA A IMPUGNAÇÃO DE EDITAL.
+    
+    TEXTO DA IMPUGNAÇÃO (DA EMPRESA):
+    "--- (Inserido via formulário) ---"
+
+    VOCÊ DEVE AGIR COMO A DEFESA JURÍDICA DO ÓRGÃO PÚBLICO. SEJA COMBATIVO, TÉCNICO E IMPLACÁVEL NA DEFESA DA LEGALIDADE DO EDITAL, SALVO ERRO CRASSO.
+
+    ESTRUTURA DO PARECER:
+
+    1.  **RELATÓRIO:**
+        - Breve síntese do pedido.
+
+    2.  **DA ADMISSIBILIDADE (PRELIMINAR):**
+        - Analise a tempestividade (Art. 164, Lei 14.133). Se a impugnação for genérica, peça o não conhecimento.
+
+    3.  **DO MÉRITO (O CORAÇÃO DA PEÇA):**
+        - Para cada alegação da empresa, apresente uma tese jurídica contrária.
+        - **SE A EMPRESA ALEGA RESTRIÇÃO:** Cite a **Súmula 247 e 263 do TCU**. Argumente que a restrição visa garantir a qualidade técnica e não frustrar a competição. O interesse público (qualidade) prevalece sobre o interesse privado (vender).
+        - **SE A EMPRESA ALEGA EXIGÊNCIA ILEGAL:** Cite o **Poder Discricionário da Administração** em definir o objeto que melhor lhe atende.
+        - Use Latim Forense onde couber (*Periculum in mora*, *Fumus boni iuris*, *Pacta sunt servanda*).
+        - Cite princípios: Vinculação ao Instrumento Convocatório, Isonomia, Eficiência.
+
+    4.  **CONCLUSÃO:**
+        - "Opina-se pelo CONHECIMENTO e, no mérito, pelo **IMPROVIMENTO (INDEFERIMENTO)** da impugnação, mantendo-se o Edital incólume..."
+    
+    O tom deve ser de autoridade jurídica. Desmonte os argumentos da empresa com a lei e jurisprudência.
+  `,
+
+  [DocumentType.ADESAO_ATA]: `
+    Elabore um DOSSIÊ TÉCNICO-JURÍDICO PARA ADESÃO A ATA DE REGISTRO DE PREÇOS ("CARONA").
+    Base Legal: Art. 86 da Lei 14.133/2021 e Decreto Federal nº 11.462/2023.
+
+    A adesão à ata (carona) é excepcional e exige justificativa robusta para não burlar o dever de licitar.
+
+    **COMANDO DE BUSCA (Grounding):** Se o usuário não forneceu dados da Ata, busque no PNCP atas vigentes para o objeto descrito.
+
+    CONTEÚDO OBRIGATÓRIO:
+
+    1.  **IDENTIFICAÇÃO DA ATA (COM LINKS):**
+        - Se encontrou ou se foi fornecido: Liste Número da Ata, Órgão Gerenciador e Link para o Edital/Ata no PNCP.
+
+    2.  **JUSTIFICATIVA DA VANTAJOSIDADE (Art. 86, §2º):**
+        - Não basta dizer que "é mais rápido".
+        - Comprove que os preços da Ata estão compatíveis com o mercado atual (faça menção a uma pesquisa de preços confirmatória anexa).
+        - Cite o Princípio da Economicidade e Eficiência Processual.
+
+    3.  **INEXISTÊNCIA DE ATA PRÓPRIA:**
+        - Declare que o órgão não possui ata vigente para o mesmo objeto.
+
+    4.  **LIMITES DE QUANTITATIVOS (TRAVAS DO DECRETO):**
+        - Cite explicitamente que a adesão respeita o limite de 50% dos quantitativos dos itens (Art. 86, §3º).
+        - Demonstre o cálculo.
+
+    5.  **PEDIDOS DE AUTORIZAÇÃO (MINUTAS DE OFÍCIO):**
+        - Ofício ao Órgão Gerenciador (solicitando autorização).
+        - Ofício ao Fornecedor Beneficiário (consultando interesse e capacidade de fornecimento).
+
+    6.  **PARECER FINAL:**
+        - Conclusão pela legalidade e vantajosidade da adesão.
+
+    Use linguagem formal de processo administrativo.
   `
 };
