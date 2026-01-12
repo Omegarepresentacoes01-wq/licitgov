@@ -9,9 +9,14 @@ export const generateDocumentStream = async (
   data: FormData,
   onChunk: (text: string) => void
 ) => {
-  const modelId = 'gemini-3-pro-preview';
+  // Alterado para 'gemini-3-flash-preview' para máxima velocidade de resposta
+  const modelId = 'gemini-3-flash-preview'; 
 
-  // Wrapper que reforça a persona e a necessidade de citações a cada execução
+  // Somente ativa a busca do Google para tipos de documentos que exigem dados de mercado reais
+  // Isso reduz drasticamente a latência inicial para outros documentos
+  const needsSearch = docType === DocumentType.PESQUISA_PRECO || 
+                      docType === DocumentType.ADESAO_ATA;
+
   const userPrompt = `
     DADOS DO PROCESSO ADMINISTRATIVO:
     -----------------------------------
@@ -27,31 +32,32 @@ export const generateDocumentStream = async (
     -----------------------------------
 
     COMANDO DE EXECUÇÃO:
-    Atue como Consultor Jurídico Sênior. Redija o documento: **${docType}**.
+    Atue como Consultor Jurídico Sênior do Governo. Redija o documento: **${docType}**.
     
     DIRETRIZES ESTRUTURAIS CRÍTICAS:
-    1.  **JURISPRUDÊNCIA:** O documento DEVE conter citações diretas ou indiretas de Acórdãos do TCU, Súmulas ou entendimentos doutrinários relevantes ao objeto.
-    2.  **BASE LEGAL:** Cite exaustivamente a Lei 14.133/2021 (Artigos, incisos).
-    3.  **EXTENSÃO:** Escreva parágrafos longos, bem fundamentados e conectados. Nada de textos curtos ou superficiais.
-    4.  **PROPRIEDADE:** Use termos como "Vantajosidade", "Economicidade", "Isonomia", "Vinculação ao Instrumento Convocatório".
-    5.  **LINKS E FONTES:** Para pesquisas de preço ou adesões, é OBRIGATÓRIO fornecer o LINK da fonte consultada para transparência.
+    1.  **BASE LEGAL:** Cite exaustivamente a Lei 14.133/2021.
+    2.  **EXTENSÃO:** Escreva parágrafos robustos e bem fundamentados.
+    3.  **OBJETIVIDADE TÉCNICA:** Seja assertivo e evite repetições desnecessárias para acelerar o processamento.
+    ${needsSearch ? '4.  **DADOS REAIS:** Use a ferramenta de busca para encontrar preços ou atas vigentes no PNCP.' : ''}
 
     DETALHES ESPECÍFICOS DO TIPO DOCUMENTAL:
     ${PROMPT_TEMPLATES[docType]}
   `;
 
   try {
+    const config: any = {
+      systemInstruction: SYSTEM_INSTRUCTION,
+      temperature: 0.2, // Reduzido ligeiramente para maior foco e velocidade
+    };
+
+    if (needsSearch) {
+      config.tools = [{ googleSearch: {} }];
+    }
+
     const response = await ai.models.generateContentStream({
       model: modelId,
       contents: userPrompt,
-      config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
-        temperature: 0.3, // Baixa temperatura para maior rigor técnico e factualidade
-        topP: 0.8,
-        topK: 40,
-        // Habilita busca no Google para encontrar preços reais e links no PNCP
-        tools: [{ googleSearch: {} }],
-      }
+      config: config
     });
 
     for await (const chunk of response) {

@@ -39,6 +39,7 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
   const isImpugnment = selectedDoc === DocumentType.IMPUGNACAO;
   const isPriceResearch = selectedDoc === DocumentType.PESQUISA_PRECO;
   const isAdhesion = selectedDoc === DocumentType.ADESAO_ATA;
+  const isDFD = selectedDoc === DocumentType.DFD;
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -69,7 +70,7 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
       {/* Header Corporativo */}
       <div className="px-6 py-5 border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-navy-800/50">
         <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-4 font-sans">
-           {isImpugnment ? 'Advogado Virtual (Defesa)' : isPriceResearch ? 'Analista de Mercado' : isAdhesion ? 'Gestão de Caronas (Adesão)' : 'Assistente de Criação'}
+           {isImpugnment ? 'Advogado Virtual (Defesa)' : isPriceResearch ? 'Analista de Mercado' : isAdhesion ? 'Gestão de Caronas (Adesão)' : isDFD ? 'Planejamento de Demanda' : 'Assistente de Criação'}
         </h2>
         
         {/* Progress Bar Limpa */}
@@ -182,7 +183,7 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
             <div className="space-y-5 animate-fadeIn">
                 <div>
                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 font-sans">
-                      {isImpugnment ? 'Objeto Impugnado (Resumo)' : isPriceResearch ? 'Itens a Cotar (Seja Específico)' : isAdhesion ? 'Item para Adesão (Carona)' : 'Objeto da Licitação'}
+                      {isImpugnment ? 'Objeto Impugnado (Resumo)' : isPriceResearch ? 'Itens a Cotar (Seja Específico)' : isAdhesion ? 'Item para Adesão (Carona)' : isDFD ? 'Necessidade a ser suprida' : 'Objeto da Licitação'}
                     </label>
                     <textarea
                         name="objectDescription"
@@ -196,6 +197,8 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
                             ? "IMPORTANTE: Para uma busca no PNCP, seja específico. Ex: 'Notebook Dell i7 16GB' em vez de apenas 'Computador'. Liste os itens e quantidades."
                             : isAdhesion
                             ? "Ex: Notebooks i7, Veículos tipo sedan, Mobiliário Escolar. Descreva o objeto que você deseja contratar via adesão."
+                            : isDFD
+                            ? "Descreva a necessidade do setor solicitante. Ex: Aquisição de mobiliário para as novas escolas municipais."
                             : "Descreva detalhadamente o item, serviço ou obra..."
                         }
                         className="w-full px-4 py-3 bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none transition-all text-slate-900 dark:text-white placeholder-slate-400 font-serif leading-relaxed"
@@ -260,7 +263,7 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
                 ) : (
                     <div>
                         <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 font-sans">
-                            {isPriceResearch ? 'Parâmetros de Pesquisa e Fontes' : 'Justificativa da Contratação'}
+                            {isPriceResearch ? 'Parâmetros de Pesquisa e Fontes' : isDFD ? 'Alinhamento Estratégico (PCA)' : 'Justificativa da Contratação'}
                         </label>
                         <textarea
                             name="justification"
@@ -269,7 +272,9 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
                             rows={4}
                             placeholder={
                                 isPriceResearch 
-                                ? "Defina a prioridade de fontes (ex: Painel de Preços, Compras Governamentais). Se quiser, especifique regiões para a busca." 
+                                ? "Defina a prioridade de fontes (ex: Painel de Preços, Compras Governamentais). Se quiser, especifique regiões para a busca."
+                                : isDFD
+                                ? "Como essa compra se alinha ao Plano de Contratações Anual (PCA)? Qual problema ela resolve para a sociedade?"
                                 : "Por que essa contratação é necessária para o interesse público?"
                             }
                             className="w-full px-4 py-3 bg-white dark:bg-navy-900 border border-slate-300 dark:border-navy-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none transition-all text-slate-900 dark:text-white placeholder-slate-400 font-serif leading-relaxed"
@@ -336,10 +341,10 @@ export const InputForm: React.FC<InputFormProps> = ({ formData, onChange, onSubm
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                {isImpugnment ? 'Gerar Parecer Jurídico' : isAdhesion ? 'Gerar Pedido de Adesão' : isPriceResearch ? 'Pesquisar Preços no PNCP' : 'Gerar Documento Oficial'}
+                {isImpugnment ? 'Gerar Parecer Jurídico' : isAdhesion ? 'Gerar Pedido de Adesão' : isPriceResearch ? 'Pesquisar Preços no PNCP' : isDFD ? 'Gerar DFD' : 'Gerar Documento Oficial'}
               </>
             ) : (
-              isImpugnment ? 'Gerar Resposta à Impugnação' : isAdhesion ? 'Gerar Pedido de Adesão' : isPriceResearch ? 'Pesquisar Preços no PNCP' : 'Gerar Documento Oficial'
+              isImpugnment ? 'Gerar Resposta à Impugnação' : isAdhesion ? 'Gerar Pedido de Adesão' : isPriceResearch ? 'Pesquisar Preços no PNCP' : isDFD ? 'Gerar DFD' : 'Gerar Documento Oficial'
             )}
           </button>
         )}

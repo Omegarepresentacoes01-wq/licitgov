@@ -1,4 +1,5 @@
 export enum DocumentType {
+  DFD = 'DFD (Formalização da Demanda)',
   ETP = 'ETP (Estudo Técnico Preliminar)',
   MAPA_RISCO = 'Mapa de Risco',
   TR = 'Termo de Referência',
@@ -17,7 +18,7 @@ export interface FormData {
   estimatedValue: string;
   justification: string;
   additionalInfo: string;
-  impugnmentText?: string; // New field for the company's argument
+  impugnmentText?: string;
 }
 
 export interface Message {
@@ -52,4 +53,33 @@ export interface SavedDocument {
   content: string;
   createdAt: string;
   preview: string;
+}
+
+// --- LOAD TEST TYPES ---
+
+export interface LogEntry {
+  timestamp: string;
+  threadId: number;
+  level: 'info' | 'warn' | 'error' | 'success';
+  message: string;
+}
+
+export interface TestMetrics {
+  id: number;
+  status: 'pending' | 'running' | 'success' | 'error';
+  startTime?: number;
+  firstTokenTime?: number;
+  endTime?: number;
+  wordCount: number;
+  content: string;
+  error?: string;
+}
+
+export interface GlobalTestStats {
+  totalRequests: number;
+  successCount: number;
+  errorCount: number;
+  avgFirstTokenLatency: number;
+  avgTotalDuration: number;
+  totalWordsGenerated: number;
 }

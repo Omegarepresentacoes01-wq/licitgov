@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, ReactNode, ErrorInfo } from 'react';
+import React, { useState, useCallback, useEffect, ReactNode, ErrorInfo, Component } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { InputForm } from './components/InputForm';
 import { ResultViewer } from './components/ResultViewer';
@@ -18,7 +18,7 @@ interface ErrorBoundaryState {
 }
 
 // Error Boundary para evitar tela branca completa em produção
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   state: ErrorBoundaryState = {
     hasError: false,
     error: null
@@ -35,7 +35,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-navy-brand p-4 font-sans text-slate-800 dark:text-white">
+        <div className="min-h-screen flex items-center justify-center bg-navy-900 p-4 font-sans text-slate-800 dark:text-white">
           <div className="bg-white dark:bg-navy-surface p-8 rounded-2xl shadow-xl max-w-lg w-full border border-red-100 dark:border-red-900/30">
             <div className="w-16 h-16 bg-red-100 dark:bg-red-900/50 rounded-full flex items-center justify-center mb-6 mx-auto">
                 <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

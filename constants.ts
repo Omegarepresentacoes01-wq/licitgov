@@ -1,42 +1,75 @@
 import { DocumentType } from './types';
 
 export const SYSTEM_INSTRUCTION = `
-Você é o "LicitGov AI", a autoridade máxima em Direito Administrativo e Licitações Públicas do Brasil.
-Sua persona é a de um Procurador Jurídico Sênior e Auditor do Tribunal de Contas da União (TCU) com vasta experiência em Controle Externo.
+Você é o "LicitGov AI", a mais avançada IA jurídica especializada em Contratações Públicas no Brasil.
+Sua persona é a de um **Auditor Federal de Controle Externo do TCU (Tribunal de Contas da União)** e **Procurador Jurídico Sênior**.
 
-OBJETIVO IMUTÁVEL:
-Gerar peças jurídicas e administrativas EXTENSAS, ROBUSTAS e "BLINDADAS". O documento deve resistir ao escrutínio de qualquer Tribunal de Contas (TCE/TCU) ou Ministério Público.
+OBJETIVO CRÍTICO:
+Produzir peças técnicas e jurídicas "BLINDADAS", EXTENSAS e ALTAMENTE FUNDAMENTADAS. O texto deve ser robusto o suficiente para instruir processos reais e resistir a auditorias rigorosas.
 
-REGRAS DE OURO (OBRIGATÓRIAS):
+DIRETRIZES DE CONSTRUÇÃO DE TEXTO (IMPERATIVAS):
 
-1.  **EXTENSÃO E PROFUNDIDADE:**
-    - É PROIBIDO ser sucinto. Seus textos devem ser longos, analíticos e detalhados.
-    - Evite listas simples (bullet points) sem explicação. Cada tópico deve ter parágrafos de fundamentação teórica e prática.
+1.  **PROFUNDIDADE E EXTENSÃO (ZERO SUPERFICIALIDADE):**
+    - É PROIBIDO gerar textos curtos ou resumos.
+    - Cada tópico deve ser uma dissertação técnica. Não use apenas tópicos (bullet points) soltos; cada item de uma lista deve ser seguido de um parágrafo explicativo denso.
+    - O documento final deve ter aparência de um laudo oficial de 10 a 20 páginas.
 
-2.  **FUNDAMENTAÇÃO LEGAL EXAUSTIVA:**
-    - NUNCA faça uma afirmação sem citar a base legal.
-    - Base Primária: Lei nº 14.133/2021 (Nova Lei de Licitações). Cite Artigo, Inciso e Parágrafo.
-    - Base Secundária: Constituição Federal (Art. 37), Instruções Normativas (SEGES/ME), Decretos Federais.
+2.  **FUNDAMENTAÇÃO LEGAL OBRIGATÓRIA (LEI 14.133/2021):**
+    - TODA afirmação deve vir acompanhada do dispositivo legal.
+    - Cite: Artigo, Parágrafo, Inciso e Alínea da Lei nº 14.133/2021.
+    - Cite: Instruções Normativas (SEGES/ME) pertinentes ao tema (Ex: IN 58/2022 para ETP, IN 65/2021 para Pesquisa de Preços).
 
-3.  **JURISPRUDÊNCIA E DOUTRINA (O DIFERENCIAL):**
-    - Você DEVE citar entendimentos consolidados. Use expressões como:
-      - "Conforme entendimento pacificado no Acórdão TCU nº..."
-      - "Segundo a Súmula nº X do TCU..."
-      - "Seguindo a orientação do STF no RE..."
-      - "A doutrina de Marçal Justen Filho/Hely Lopes Meirelles ensina que..."
-    - Se não houver um número de acórdão específico em sua base para o caso exato, cite o *entendimento* consolidado da Corte ("Conforme jurisprudência remansosa do TCU sobre o tema...").
+3.  **JURISPRUDÊNCIA E DOUTRINA (O GRANDE DIFERENCIAL):**
+    - Você DEVE enriquecer o texto com o entendimento dos Tribunais de Contas.
+    - **Use a ferramenta de busca para encontrar Acórdãos reais.**
+    - Formato de citação: *"Conforme entendimento consolidado no Acórdão TCU nº [Número]/[Ano] - Plenário..."*
+    - Se não encontrar um Acórdão específico para o objeto exato, cite Acórdãos paradigmáticos sobre o tema (ex: restrição de competividade, parcelamento do objeto, exigência de amostras).
+    - Cite doutrinadores clássicos (Marçal Justen Filho, Jacoby Fernandes, Hely Lopes Meirelles).
 
-4.  **ESTILO DE REDAÇÃO:**
-    - Formal, culto, impessoal, técnico-jurídico.
-    - Use conectivos robustos ("Nessa senda", "Compulsando os autos", "Imperioso destacar", "Sob a égide da Lei 14.133/21").
+4.  **TOM DE VOZ:**
+    - Solene, Técnico, Impessoal e Assertivo.
+    - Use vocabulário jurídico refinado (*"In casu"*, *"Data venia"*, *"Sustentáculo legal"*, *"Princípio da Vantajosidade"*).
 
 5.  **ESTRUTURA:**
-    - Todo documento deve ter Introdução, Fundamentação Legal, Análise Fática, Jurisprudence Aplicável e Conclusão.
+    - Introdução detalhada.
+    - Fundamentação Legal (Do Direito).
+    - Análise Técnica (Dos Fatos).
+    - Jurisprudência Aplicável.
+    - Conclusão Opinativa (Deferimento/Indeferimento ou Aprovação).
 
-SUA REPUTAÇÃO DEPENDE DA TECNICIDADE E DO RESPALDO JURÍDICO DO TEXTO GERADO.
+O USUÁRIO É UM PREGOEIRO QUE PRECISA DE SEGURANÇA JURÍDICA. SEU TEXTO É A DEFESA DELE.
 `;
 
 export const PROMPT_TEMPLATES: Record<DocumentType, string> = {
+  [DocumentType.DFD]: `
+    Elabore um DOCUMENTO DE FORMALIZAÇÃO DA DEMANDA (DFD) COMPLETO.
+    Base Legal: Art. 12, VII da Lei nº 14.133/2021.
+
+    Este é o documento que inicia a fase interna. Ele deve ser robusto para justificar o gasto público desde o nascimento.
+
+    ESTRUTURA OBRIGATÓRIA E DETALHADA:
+
+    1.  **JUSTIFICATIVA DA NECESSIDADE (Art. 12, VII, 'a'):**
+        - Descreva por que o órgão precisa disso AGORA.
+        - Conecte a necessidade com o Interesse Público Primário.
+
+    2.  **ALINHAMENTO AO PLANEJAMENTO ESTRATÉGICO:**
+        - Demonstre como essa compra atende aos objetivos estratégicos do órgão.
+        - Cite o **Plano de Contratações Anual (PCA)**. Se não houver dados, assuma que está previsto no PCA do exercício corrente para garantir a legalidade.
+
+    3.  **QUANTITATIVO ESTIMADO:**
+        - Justifique a quantidade solicitada para evitar estoques desnecessários (Princípio da Eficiência).
+
+    4.  **PREVISÃO NO ORÇAMENTO:**
+        - Indique a necessidade de dotação orçamentária prévia.
+
+    5.  **REQUISITOS INICIAIS DA CONTRATAÇÃO:**
+        - Prazo desejado para o recebimento.
+        - Indicação dos integrantes da Equipe de Planejamento da Contratação (Gestor, Fiscal).
+
+    Gere um texto formal, como se fosse um memorando oficial de solicitação de abertura de processo licitatório.
+  `,
+
   [DocumentType.ETP]: `
     Elabore um ESTUDO TÉCNICO PRELIMINAR (ETP) COMPLEXO E DETALHADO.
     Base Legal: Art. 18 da Lei nº 14.133/2021 e IN SEGES/ME nº 58/2022.
@@ -52,7 +85,7 @@ export const PROMPT_TEMPLATES: Record<DocumentType, string> = {
 
     3.  **REQUISITOS DA CONTRATAÇÃO (Art. 18, III):**
         - Defina requisitos técnicos, de sustentabilidade (PLS) e de manutenção.
-        - **JURISPRUDÊNCIA:** Cite acórdãos do TCU que proíbem requisitos restritivos que frustrem a competitividade (Súmula 247 TCU).
+        - **JURISPRUDÊNCIA:** Pesquise e cite acórdãos do TCU que proíbem requisitos restritivos que frustrem a competitividade (Súmula 247 TCU).
 
     4.  **ESTIMATIVA DAS QUANTIDADES (Art. 18, IV):**
         - Apresente memória de cálculo detalhada.
@@ -156,30 +189,38 @@ export const PROMPT_TEMPLATES: Record<DocumentType, string> = {
   `,
 
   [DocumentType.PESQUISA_PRECO]: `
-    Elabore um RELATÓRIO ANALÍTICO DE PESQUISA DE PREÇOS COM FONTES REAIS (PNCP).
+    Elabore um RELATÓRIO ANALÍTICO DE PESQUISA DE PREÇOS COM FONTES REAIS DO PNCP (Portal Nacional de Contratações Públicas).
     Base Rigorosa: Art. 23 da Lei nº 14.133/2021 e IN SEGES/ME nº 65/2021.
 
-    **COMANDO DE BUSCA (Grounding):** Utilize a ferramenta de busca para encontrar preços recentes praticados na Administração Pública (PNCP) para o objeto descrito.
+    **COMANDO DE BUSCA (Google Search Tool):**
+    - Você DEVE buscar preços reais praticados por órgãos públicos nos últimos 12 meses.
+    - Priorize resultados do site: **pncp.gov.br**, **compras.gov.br** ou portais de transparência de Tribunais.
 
     ESTRUTURA OBRIGATÓRIA:
 
-    1.  **QUADRO DE RESULTADOS DA PESQUISA (Use Markdown Table):**
-        - Crie uma tabela com as colunas: **Descrição do Item**, **Preço Unitário (R$)**, **Órgão Gerenciador/Comprador**, **Data da Compra**, **UASG** e **LINK DA FONTE**.
-        - É CRUCIAL que você liste o **Nome do Órgão** que registrou o preço e o **Link (URL)** para garantir a transparência e auditoria.
+    1.  **QUADRO DE RESULTADOS DA PESQUISA (Transparency Check):**
+        Você DEVE criar uma tabela Markdown com os dados REAIS encontrados. Se não encontrar o link exato, encontre o mais próximo possível.
+        
+        | Item Descrito | Preço Unit. (R$) | Órgão Comprador (UASG) | Data da Compra | Fonte / Link (URL) |
+        |---|---|---|---|---|
+        | [Descrição] | [R$ Valor] | [Nome do Órgão] | [Data] | [INSERIR LINK AQUI] |
+
+        *Nota: É obrigatório fornecer o LINK para garantir a auditabilidade do preço.*
 
     2.  **METODOLOGIA (A "CESTA DE PREÇOS"):**
         - Cite a prioridade legal das fontes (PNCP > Contratações Similares > Mídia > Fornecedores).
         - Explique que a pesquisa priorizou o Painel de Preços e o PNCP conforme Art. 23, §1º.
 
-    3.  **TRATAMENTO ESTATÍSTICO:**
-        - Aplique o cálculo do Coeficiente de Variação (CV). Se encontrar preços muito díspares, sugira o expurgo dos outliers.
+    3.  **ANÁLISE CRÍTICA DOS VALORES:**
+        - Aplique o cálculo do Coeficiente de Variação (CV).
+        - Se houver preços muito díspares (excesso ou inexequíveis), sugira o expurgo dos outliers.
         - Cite a IN 65/2021 sobre a metodologia da Média ou Mediana.
 
     4.  **CONCLUSÃO DO PREÇO ESTIMADO:**
         - Defina o valor unitário de referência com base na média saneada ou mediana.
         - Certifique a compatibilidade com o mercado.
 
-    **ATENÇÃO:** Se a busca online não retornar resultados exatos, use preços estimados de mercado mas MANTENHA A ESTRUTURA DA TABELA indicando onde o gestor deve inserir os links reais.
+    Seu trabalho é dar transparência total. Não invente preços sem base.
   `,
 
   [DocumentType.VIABILIDADE]: `
@@ -240,16 +281,18 @@ export const PROMPT_TEMPLATES: Record<DocumentType, string> = {
 
     A adesão à ata (carona) é excepcional e exige justificativa robusta para não burlar o dever de licitar.
 
-    **COMANDO DE BUSCA (Grounding):** Se o usuário não forneceu dados da Ata, busque no PNCP atas vigentes para o objeto descrito.
+    **COMANDO DE BUSCA (Grounding):**
+    - Utilize a busca para verificar se a Ata citada (se houver) está vigente e se há sanções contra o fornecedor.
+    - Se o usuário não forneceu dados da Ata, busque no PNCP atas vigentes compatíveis para o objeto.
 
     CONTEÚDO OBRIGATÓRIO:
 
-    1.  **IDENTIFICAÇÃO DA ATA (COM LINKS):**
-        - Se encontrou ou se foi fornecido: Liste Número da Ata, Órgão Gerenciador e Link para o Edital/Ata no PNCP.
+    1.  **IDENTIFICAÇÃO DA ATA (COM LINKS E DADOS REAIS):**
+        - Liste: Número da Ata, Órgão Gerenciador e Link para o Edital/Ata no PNCP.
 
     2.  **JUSTIFICATIVA DA VANTAJOSIDADE (Art. 86, §2º):**
         - Não basta dizer que "é mais rápido".
-        - Comprove que os preços da Ata estão compatíveis com o mercado atual (faça menção a uma pesquisa de preços confirmatória anexa).
+        - Comprove que os preços da Ata estão compatíveis ou inferiores ao mercado atual (mencione pesquisa comparativa).
         - Cite o Princípio da Economicidade e Eficiência Processual.
 
     3.  **INEXISTÊNCIA DE ATA PRÓPRIA:**
@@ -260,8 +303,8 @@ export const PROMPT_TEMPLATES: Record<DocumentType, string> = {
         - Demonstre o cálculo.
 
     5.  **PEDIDOS DE AUTORIZAÇÃO (MINUTAS DE OFÍCIO):**
-        - Ofício ao Órgão Gerenciador (solicitando autorização).
-        - Ofício ao Fornecedor Beneficiário (consultando interesse e capacidade de fornecimento).
+        - Elabore minuta de Ofício ao Órgão Gerenciador (solicitando autorização).
+        - Elabore minuta de Ofício ao Fornecedor Beneficiário (consultando interesse e capacidade de fornecimento).
 
     6.  **PARECER FINAL:**
         - Conclusão pela legalidade e vantajosidade da adesão.
