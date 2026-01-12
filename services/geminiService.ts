@@ -1,53 +1,41 @@
+
 import { GoogleGenAI } from "@google/genai";
 import { DocumentType, FormData } from '../types';
 import { PROMPT_TEMPLATES, SYSTEM_INSTRUCTION } from '../constants';
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateDocumentStream = async (
   docType: DocumentType,
   data: FormData,
   onChunk: (text: string) => void
 ) => {
-  // Alterado para 'gemini-3-flash-preview' para máxima velocidade de resposta
+  // Inicialização dentro da função para garantir que usa a chave mais atual do env
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  
+  // 'gemini-3-flash-preview' é significativamente mais rápido que o Pro para tarefas de texto
   const modelId = 'gemini-3-flash-preview'; 
 
-  // Somente ativa a busca do Google para tipos de documentos que exigem dados de mercado reais
-  // Isso reduz drasticamente a latência inicial para outros documentos
+  // Ativação inteligente de ferramentas para reduzir latência
   const needsSearch = docType === DocumentType.PESQUISA_PRECO || 
                       docType === DocumentType.ADESAO_ATA;
 
   const userPrompt = `
-    DADOS DO PROCESSO ADMINISTRATIVO:
-    -----------------------------------
+    DADOS DO PROCESSO:
     ÓRGÃO: ${data.organName}
-    CIDADE/UF: ${data.city}
-    MODALIDADE: ${data.modality}
-    CRITÉRIO: ${data.judgmentCriteria}
     OBJETO: ${data.objectDescription}
-    VALOR ESTIMADO: ${data.estimatedValue}
-    JUSTIFICATIVA INICIAL: ${data.justification}
-    OBSERVAÇÕES: ${data.additionalInfo}
-    ${data.impugnmentText ? `\n--- TEXTO DA IMPUGNAÇÃO RECEBIDA: ---\n${data.impugnmentText}\n------------------` : ''}
-    -----------------------------------
-
-    COMANDO DE EXECUÇÃO:
-    Atue como Consultor Jurídico Sênior do Governo. Redija o documento: **${docType}**.
+    VALOR: ${data.estimatedValue}
+    TIPO: ${docType}
     
-    DIRETRIZES ESTRUTURAIS CRÍTICAS:
-    1.  **BASE LEGAL:** Cite exaustivamente a Lei 14.133/2021.
-    2.  **EXTENSÃO:** Escreva parágrafos robustos e bem fundamentados.
-    3.  **OBJETIVIDADE TÉCNICA:** Seja assertivo e evite repetições desnecessárias para acelerar o processamento.
-    ${needsSearch ? '4.  **DADOS REAIS:** Use a ferramenta de busca para encontrar preços ou atas vigentes no PNCP.' : ''}
+    INSTRUÇÃO: Redija o documento completo conforme Lei 14.133/21. Seja extenso e técnico.
+    ${needsSearch ? 'Use a ferramenta googleSearch para buscar preços/atas reais no PNCP.' : ''}
 
-    DETALHES ESPECÍFICOS DO TIPO DOCUMENTAL:
+    TEMPLATES DE REFERÊNCIA:
     ${PROMPT_TEMPLATES[docType]}
   `;
 
   try {
     const config: any = {
       systemInstruction: SYSTEM_INSTRUCTION,
-      temperature: 0.2, // Reduzido ligeiramente para maior foco e velocidade
+      temperature: 0.3,
     };
 
     if (needsSearch) {
@@ -56,17 +44,19 @@ export const generateDocumentStream = async (
 
     const response = await ai.models.generateContentStream({
       model: modelId,
-      contents: userPrompt,
+      contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
       config: config
     });
 
     for await (const chunk of response) {
-      if (chunk.text) {
-        onChunk(chunk.text);
+      const text = chunk.text;
+      if (text) {
+        onChunk(text);
       }
     }
-  } catch (error) {
-    console.error("Error generating document:", error);
+  } catch (error: any) {
+    console.error("API Error:", error);
+    // Repassa o erro detalhado para o App.tsx tratar
     throw error;
   }
 };
