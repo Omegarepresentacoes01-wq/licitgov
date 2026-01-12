@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { DocumentType, User } from '../types';
 
@@ -71,7 +72,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   return (
     <>
-      {/* Mobile Backdrop */}
       <div 
         className={`fixed inset-0 bg-navy-950/90 z-40 lg:hidden backdrop-blur-sm transition-opacity duration-300 ${
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
@@ -80,7 +80,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         aria-hidden="true"
       />
 
-      {/* Sidebar Container - Use Navy-900 instead of 950 for slightly lighter feel */}
       <aside className={`
         fixed lg:static inset-y-0 left-0 z-50
         w-[280px] bg-navy-900 border-r border-white/5
@@ -88,15 +87,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
         transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-        {/* Header - Text Only, No Icon */}
         <div className="h-20 flex items-center justify-between px-6 border-b border-white/5 bg-navy-900 shrink-0">
           <div>
             <h1 className="font-sans font-extrabold text-2xl text-white tracking-tight">
               LicitGov<span className="text-primary-500">.</span>
             </h1>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
-              Inteligência Pública
-            </p>
+            <div className="flex items-center gap-2 mt-0.5">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  AI Matrix
+                </p>
+                <span className="bg-primary-500/10 text-primary-500 border border-primary-500/30 text-[8px] px-1.5 py-0.5 rounded-full font-black uppercase tracking-tighter">Pro Core</span>
+            </div>
           </div>
           
           <button 
@@ -109,10 +110,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
 
-        {/* Menu Items */}
         <div className="flex-1 overflow-y-auto py-8 px-4 space-y-2">
           <div className="px-2 mb-4">
-            <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Documentos Oficiais</h3>
+            <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Documentos de Elite</h3>
           </div>
           
           {Object.values(DocumentType).map((doc) => {
@@ -146,7 +146,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           })}
         </div>
 
-        {/* User Profile Section */}
         {currentUser && (
             <div className="p-4 bg-navy-900 border-t border-white/5 shrink-0">
                 <div className="flex items-center gap-3 mb-4 p-3 rounded-xl bg-white/5 border border-white/5 group hover:border-white/10 transition-colors">
@@ -155,7 +154,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     </div>
                     <div className="flex-1 min-w-0">
                         <p className="text-sm font-bold text-white truncate leading-tight group-hover:text-primary-400 transition-colors">{currentUser.name}</p>
-                        <p className="text-xs text-slate-500 truncate mt-0.5">{currentUser.organization}</p>
+                        <p className="text-xs text-slate-500 truncate mt-0.5">Gov Auditor</p>
                     </div>
                     
                     <button 
@@ -177,7 +176,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         }}
                         className="w-full mb-3 py-2.5 bg-navy-800 hover:bg-navy-700 text-slate-300 hover:text-white text-xs font-bold rounded-lg border border-white/5 transition-all uppercase tracking-wide hover:shadow-md"
                     >
-                        Painel Administrativo
+                        Admin Control Center
                     </button>
                 )}
                 

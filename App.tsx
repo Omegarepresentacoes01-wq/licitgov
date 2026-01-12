@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { Component, useState, useCallback, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { InputForm } from './components/InputForm';
 import { ResultViewer } from './components/ResultViewer';
@@ -18,8 +18,8 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-// Fix Error 1: Using React.Component and providing a constructor to ensure props are correctly initialized and typed for 'this.props' access
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+// Fix ErrorBoundary state and props existence by using explicit Component inheritance
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
@@ -49,7 +49,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 }
 
-// Fix Error 2: Renamed AppContent to App to resolve "Cannot find name 'App'" during export and match expectation in index.tsx
+// Renamed AppContent to App to resolve "Cannot find name 'App'" during export and match expectation in index.tsx
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [view, setView] = useState<'login' | 'app' | 'admin'>('login');
@@ -152,7 +152,7 @@ const App: React.FC = () => {
           <header className="px-6 py-4 flex justify-between items-center z-10 border-b border-slate-200 dark:border-white/5">
             <div className="flex items-center gap-3">
               <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 text-slate-600 dark:text-slate-300">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 6h16M4 12h16M4 18h16" strokeWidth={2}/></svg>
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 6h16M4 12h16M4 18h16" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/></svg>
               </button>
               <h2 className="text-xl font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">{selectedDoc.split('(')[0]}</h2>
             </div>

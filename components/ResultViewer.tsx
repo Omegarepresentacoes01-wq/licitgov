@@ -36,10 +36,13 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ content, isGeneratin
     <div className="flex flex-col h-full bg-slate-100 dark:bg-navy-900 rounded-xl overflow-hidden border border-slate-200 dark:border-white/5 shadow-soft">
       <div className="bg-white dark:bg-navy-surface p-3 border-b border-slate-200 dark:border-white/5 flex justify-between items-center">
         <div className="flex items-center gap-3 px-2">
-            <span className={`w-2.5 h-2.5 rounded-full ${isGenerating ? 'bg-primary-500 animate-pulse' : 'bg-emerald-500'}`} />
-            <h3 className="font-bold text-slate-700 dark:text-white text-xs truncate max-w-xs uppercase tracking-wider">
-                {documentTitle}
-            </h3>
+            <span className={`w-2.5 h-2.5 rounded-full ${isGenerating ? 'bg-primary-500 animate-pulse shadow-glow' : 'bg-emerald-500'}`} />
+            <div className="flex flex-col">
+                <h3 className="font-bold text-slate-700 dark:text-white text-xs truncate max-w-xs uppercase tracking-wider leading-none">
+                    {documentTitle}
+                </h3>
+                {isGenerating && <span className="text-[8px] text-primary-500 font-black uppercase mt-1 tracking-tighter">Gemini 3 Pro Core Active</span>}
+            </div>
         </div>
         <div className="flex gap-2">
             <button onClick={handleCopy} disabled={!content} className="px-3 py-1.5 text-[10px] font-black uppercase text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-navy-800 rounded border border-slate-200 dark:border-white/10">Copiar</button>
@@ -54,9 +57,15 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ content, isGeneratin
             
             {isGenerating && (
                 <div className="mt-12 flex flex-col items-center gap-4 py-10 border-t border-slate-100">
-                    <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
-                    <div className="text-primary-600 font-black uppercase tracking-[0.2em] text-[10px] animate-pulse">
-                         IA processando fundamentação jurídica...
+                    <div className="relative">
+                        <div className="w-10 h-10 border-4 border-primary-500/20 rounded-full"></div>
+                        <div className="absolute inset-0 w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                    <div className="text-center">
+                         <div className="text-primary-600 font-black uppercase tracking-[0.2em] text-[10px] animate-pulse">
+                              Deep Thinking Analysis...
+                         </div>
+                         <p className="text-[9px] text-slate-400 font-bold uppercase mt-1">Processando raciocínio jurídico avançado</p>
                     </div>
                 </div>
             )}

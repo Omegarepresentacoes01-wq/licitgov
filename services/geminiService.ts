@@ -8,34 +8,45 @@ export const generateDocumentStream = async (
   data: FormData,
   onChunk: (text: string) => void
 ) => {
-  // Inicialização dentro da função para garantir que usa a chave mais atual do env
+  // Inicialização com a chave do ambiente
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  // 'gemini-3-flash-preview' é significativamente mais rápido que o Pro para tarefas de texto
-  const modelId = 'gemini-3-flash-preview'; 
+  /**
+   * UPGRADE PARA GEMINI 3 PRO
+   * Ideal para tarefas complexas de raciocínio jurídico e STEM.
+   * Mais lento que o Flash, porém muito mais preciso e profundo.
+   */
+  const modelId = 'gemini-3-pro-preview'; 
 
-  // Ativação inteligente de ferramentas para reduzir latência
   const needsSearch = docType === DocumentType.PESQUISA_PRECO || 
                       docType === DocumentType.ADESAO_ATA;
 
   const userPrompt = `
-    DADOS DO PROCESSO:
+    DADOS DO PROCESSO ADMINISTRATIVO:
     ÓRGÃO: ${data.organName}
     OBJETO: ${data.objectDescription}
     VALOR: ${data.estimatedValue}
-    TIPO: ${docType}
+    DOCUMENTO ALVO: ${docType}
     
-    INSTRUÇÃO: Redija o documento completo conforme Lei 14.133/21. Seja extenso e técnico.
-    ${needsSearch ? 'Use a ferramenta googleSearch para buscar preços/atas reais no PNCP.' : ''}
+    INSTRUÇÃO DE ALTA PERFORMANCE:
+    Como Auditor do TCU, redija este documento com profundidade máxima. 
+    Analise os riscos, a viabilidade e a fundamentação na Lei 14.133/21.
+    Não resuma. Use linguagem jurídica solene.
 
-    TEMPLATES DE REFERÊNCIA:
+    ESTRUTURA DE REFERÊNCIA:
     ${PROMPT_TEMPLATES[docType]}
   `;
 
   try {
     const config: any = {
       systemInstruction: SYSTEM_INSTRUCTION,
-      temperature: 0.3,
+      temperature: 0.4, // Aumentado levemente para permitir maior fluidez textual no Pro
+      /**
+       * THINKING CONFIG: 
+       * Permite que o modelo 'pense' antes de responder.
+       * O budget de 16000 tokens garante uma análise jurídica profunda.
+       */
+      thinkingConfig: { thinkingBudget: 16000 }
     };
 
     if (needsSearch) {
@@ -55,8 +66,7 @@ export const generateDocumentStream = async (
       }
     }
   } catch (error: any) {
-    console.error("API Error:", error);
-    // Repassa o erro detalhado para o App.tsx tratar
+    console.error("API Pro Error:", error);
     throw error;
   }
 };
