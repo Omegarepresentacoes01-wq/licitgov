@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { MarkdownViewer } from './MarkdownViewer';
 
 interface ResultViewerProps {
@@ -10,6 +10,7 @@ interface ResultViewerProps {
 
 export const ResultViewer: React.FC<ResultViewerProps> = ({ content, isGenerating, documentTitle }) => {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (isGenerating && bottomRef.current) {
@@ -19,7 +20,8 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ content, isGeneratin
 
   const handleCopy = () => {
     navigator.clipboard.writeText(content);
-    alert('Texto copiado.');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   if (!content && !isGenerating) {
@@ -45,7 +47,9 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({ content, isGeneratin
             </div>
         </div>
         <div className="flex gap-2">
-            <button onClick={handleCopy} disabled={!content} className="px-3 py-1.5 text-[10px] font-black uppercase text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-navy-800 rounded border border-slate-200 dark:border-white/10">Copiar</button>
+            <button onClick={handleCopy} disabled={!content} className={`px-3 py-1.5 text-[10px] font-black uppercase rounded border transition-all ${copied ? 'bg-emerald-500 text-white border-emerald-500' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-navy-800 border-slate-200 dark:border-white/10'}`}>
+              {copied ? '✓ Copiado!' : 'Copiar'}
+            </button>
         </div>
       </div>
       

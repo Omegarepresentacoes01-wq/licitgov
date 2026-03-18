@@ -8,6 +8,7 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { DocumentType, FormData, GenerationState, User } from './types';
 import { generateDocumentStream } from './services/geminiService';
 import { getCurrentUser, logout, saveDocument } from './services/mockBackend';
+import { HistoryPanel } from './components/HistoryPanel';
 
 interface ErrorBoundaryProps {
   children?: React.ReactNode;
@@ -52,7 +53,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 // Renamed AppContent to App to resolve "Cannot find name 'App'" during export and match expectation in index.tsx
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [view, setView] = useState<'login' | 'app' | 'admin'>('login');
+  const [view, setView] = useState<'login' | 'app' | 'admin' | 'history'>('login');
   const [selectedDoc, setSelectedDoc] = useState<DocumentType>(DocumentType.ETP);
   const [outputContent, setOutputContent] = useState<string>('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -131,19 +132,21 @@ const App: React.FC = () => {
 
   if (view === 'login') return <LoginPage onLoginSuccess={(u) => { setCurrentUser(u); setView('app'); }} />;
   if (view === 'admin' && currentUser?.role === 'admin') return <AdminDashboard currentUser={currentUser} onExit={() => setView('app')} />;
+  if (view === 'history' && currentUser) return <HistoryPanel currentUser={currentUser} onBack={() => setView('app')} onLoadDocument={(doc) => { setSelectedDoc(doc.type); setOutputContent(doc.content); setView('app'); }} />;
 
   return (
     <ErrorBoundary>
       <div className="flex flex-col lg:flex-row h-screen w-full overflow-hidden bg-slate-50 dark:bg-navy-900 transition-colors">
-        <Sidebar 
-          selectedDoc={selectedDoc} 
-          onSelect={(doc) => { setSelectedDoc(doc); setOutputContent(''); setGenState({isGenerating: false, error: null}); }} 
+        <Sidebar
+          selectedDoc={selectedDoc}
+          onSelect={(doc) => { setSelectedDoc(doc); setOutputContent(''); setGenState({isGenerating: false, error: null}); }}
           isGenerating={genState.isGenerating}
           darkMode={darkMode}
           toggleDarkMode={() => setDarkMode(!darkMode)}
           currentUser={currentUser}
           onLogout={() => { logout(); setCurrentUser(null); setView('login'); }}
           onAdminClick={() => setView('admin')}
+          onHistoryClick={() => setView('history')}
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
         />

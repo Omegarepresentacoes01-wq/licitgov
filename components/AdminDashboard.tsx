@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { User, TestMetrics, GlobalTestStats, DocumentType, LogEntry } from '../types';
-import { getAllUsers, createUser, toggleUserStatus, getAllDocumentsCount } from '../services/mockBackend';
+import { getAllUsers, createUser, toggleUserStatus, deleteUser, getAllDocumentsCount } from '../services/mockBackend';
 import { generateDocumentStream } from '../services/geminiService';
 import { MarkdownViewer } from './MarkdownViewer';
 
@@ -10,10 +10,16 @@ interface AdminDashboardProps {
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser, onExit }) => {
-  const [activeTab, setActiveTab] = useState<'users' | 'stress' | 'logs' | 'branding'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'stress' | 'logs'>('users');
   const [users, setUsers] = useState<User[]>([]);
   const [totalDocs, setTotalDocs] = useState(0);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [newUserName, setNewUserName] = useState('');
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserPassword, setNewUserPassword] = useState('');
+  const [newUserOrg, setNewUserOrg] = useState('');
+  const [newUserRole, setNewUserRole] = useState<'user' | 'admin'>('user');
+  const [modalError, setModalError] = useState('');
   
   // Stress Test State (Extreme 250)
   const [concurrentReqs, setConcurrentReqs] = useState(50);
@@ -146,6 +152,40 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser, onE
     };
   }, [testResults]);
 
+  const handleCreateUser = (e: React.FormEvent) => {
+    e.preventDefault();
+    setModalError('');
+    try {
+      createUser({
+        name: newUserName,
+        email: newUserEmail,
+        role: newUserRole,
+        organization: newUserOrg,
+        active: true
+      }, newUserPassword);
+      setShowAddModal(false);
+      setNewUserName('');
+      setNewUserEmail('');
+      setNewUserPassword('');
+      setNewUserOrg('');
+      setNewUserRole('user');
+      loadData();
+    } catch (err: any) {
+      setModalError(err.message || 'Erro ao criar utilizador.');
+    }
+  };
+
+  const handleDeleteUser = (userId: string, userName: string) => {
+    if (!window.confirm(`Eliminar permanentemente "${userName}"?`)) return;
+    try {
+      const updated = deleteUser(userId);
+      setUsers([...updated]);
+      setTotalDocs(getAllDocumentsCount());
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
   const handleToggleStatus = (userId: string) => {
     try {
       const updatedUsers = toggleUserStatus(userId);
@@ -157,7 +197,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser, onE
     <div className="min-h-screen bg-[#020408] text-slate-100 font-sans overflow-hidden flex flex-col">
       <header className="bg-black/60 backdrop-blur-2xl border-b border-white/5 px-8 py-5 flex justify-between items-center shrink-0 z-20">
         <div className="flex items-center gap-12">
-            <div className="flex items-center gap-4 group cursor-pointer" onClick={() => setActiveTab('branding')}>
+            <div className="flex items-center gap-4">
                 <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center font-black text-xl text-white italic shadow-[0_0_25px_rgba(249,115,22,0.4)] transition-transform group-hover:rotate-12">L</div>
                 <div className="flex flex-col">
                     <h1 className="text-xl font-black text-white tracking-tighter uppercase italic leading-none">LicitGov <span className="text-primary-500">Matrix Core</span></h1>
@@ -169,8 +209,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser, onE
                 {[
                     { id: 'users', label: 'Agentes', icon: '👤' },
                     { id: 'stress', label: 'Stress Matrix', icon: '⚡' },
-                    { id: 'logs', label: 'Kernel Logs', icon: '⌨️' },
-                    { id: 'branding', label: 'Audit Logos', icon: '🖼️' }
+                    { id: 'logs', label: 'Kernel Logs', icon: '⌨️' }
                 ].map(tab => (
                     <button 
                         key={tab.id}
@@ -247,9 +286,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser, onE
                                               {user.active ? 'Operational' : 'Revoked'}
                                           </span>
                                       </td>
-                                      <td className="px-8 py-6 text-right">
+                                      <td className="px-8 py-6 text-right flex items-center justify-end gap-3">
                                           {user.role !== 'admin' && (
-                                              <button onClick={() => handleToggleStatus(user.id)} className="text-primary-500 text-[10px] font-black uppercase tracking-widest hover:text-white transition-all bg-white/5 px-4 py-2 rounded-lg border border-white/5 hover:bg-primary-600">Switch Protocol</button>
+                                              <>
+                                                <button onClick={() => handleToggleStatus(user.id)} className="text-primary-500 text-[10px] font-black uppercase tracking-widest hover:text-white transition-all bg-white/5 px-4 py-2 rounded-lg border border-white/5 hover:bg-primary-600">Switch Protocol</button>
+                                                <button onClick={() => handleDeleteUser(user.id, user.name)} className="text-red-500 text-[10px] font-black uppercase tracking-widest hover:text-white transition-all bg-red-500/5 px-4 py-2 rounded-lg border border-red-500/20 hover:bg-red-600">Delete</button>
+                                              </>
                                           )}
                                       </td>
                                   </tr>
@@ -346,7 +388,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser, onE
                             <div key={i} className={`flex gap-6 border-l-4 pl-4 py-0.5 ${log.level === 'error' ? 'border-red-500 bg-red-500/10' : log.level === 'warn' ? 'border-primary-500 bg-primary-500/10' : log.level === 'success' ? 'border-emerald-500 bg-emerald-500/10' : 'border-slate-800'}`}>
                                 <span className="text-slate-600 shrink-0 font-bold">[{log.timestamp}]</span>
                                 <span className={`font-black shrink-0 w-28 italic ${log.level === 'error' ? 'text-red-400' : log.level === 'warn' ? 'text-primary-400' : log.level === 'success' ? 'text-emerald-400' : 'text-slate-400'}`}>
-                                    >> THREAD_{log.threadId}
+                                    {'>>'} THREAD_{log.threadId}
                                 </span>
                                 <span className={`${log.level === 'error' ? 'text-red-300 font-bold' : 'text-slate-300'}`}>{log.message}</span>
                             </div>
@@ -357,22 +399,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser, onE
             </div>
         )}
 
-        {activeTab === 'branding' && (
-            <div className="h-full flex flex-col animate-fadeIn max-w-6xl mx-auto w-full">
-                <div className="bg-white/5 border border-white/5 p-12 rounded-[3rem] shadow-2xl backdrop-blur-xl h-full flex flex-col">
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 overflow-y-auto pr-4 custom-scrollbar">
-                         {Array.from({ length: 24 }).map((_, i) => (
-                             <div key={i} className="flex flex-col items-center gap-4 group">
-                                 <div className="w-full aspect-square bg-black/40 rounded-3xl border border-white/5 flex items-center justify-center p-6 group-hover:border-primary-500/50 transition-all group-hover:bg-black/60 shadow-xl">
-                                     <div className="w-16 h-16 bg-primary-600 rounded-2xl flex items-center justify-center font-black text-2xl text-white italic transition-transform group-hover:rotate-12">L</div>
-                                 </div>
-                                 <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest group-hover:text-primary-500 transition-colors">LicitGov Icon v{i+1}</span>
-                             </div>
-                         ))}
-                    </div>
-                </div>
-            </div>
-        )}
       </main>
 
       {/* Extreme Audit Modal */}
@@ -415,21 +441,44 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentUser, onE
         <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-6">
              <div className="bg-[#0b0e14] border border-white/10 rounded-[3rem] shadow-2xl max-w-md w-full p-12 animate-fadeIn relative overflow-hidden">
                  <h3 className="text-3xl font-black text-white italic uppercase tracking-tighter mb-10 leading-none">Authorize <span className="text-primary-500">Agent</span></h3>
-                 <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); setShowAddModal(false); loadData(); }}>
+                 <form className="space-y-6" onSubmit={handleCreateUser}>
                     <div className="space-y-2">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Legal Identity</label>
-                        <input type="text" required className="w-full px-6 py-4 bg-black/50 rounded-2xl border border-white/5 text-sm text-white focus:border-primary-500 outline-none transition-all shadow-inner" placeholder="Nome do Pregoeiro / Auditor" />
+                        <input type="text" required value={newUserName} onChange={e => setNewUserName(e.target.value)} className="w-full px-6 py-4 bg-black/50 rounded-2xl border border-white/5 text-sm text-white focus:border-primary-500 outline-none transition-all shadow-inner" placeholder="Nome do Pregoeiro / Auditor" />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Órgão / Organização</label>
+                        <input type="text" value={newUserOrg} onChange={e => setNewUserOrg(e.target.value)} className="w-full px-6 py-4 bg-black/50 rounded-2xl border border-white/5 text-sm text-white focus:border-primary-500 outline-none transition-all shadow-inner" placeholder="Prefeitura de... / Ministério de..." />
                     </div>
                     <div className="space-y-2">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Gov Mail Protocol</label>
-                        <input type="email" required className="w-full px-6 py-4 bg-black/50 rounded-2xl border border-white/5 text-sm text-white focus:border-primary-500 outline-none transition-all shadow-inner" placeholder="nome@orgao.gov.br" />
+                        <input type="email" required value={newUserEmail} onChange={e => setNewUserEmail(e.target.value)} className="w-full px-6 py-4 bg-black/50 rounded-2xl border border-white/5 text-sm text-white focus:border-primary-500 outline-none transition-all shadow-inner" placeholder="nome@orgao.gov.br" />
                     </div>
                     <div className="space-y-2">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Security Token</label>
-                        <input type="password" required className="w-full px-6 py-4 bg-black/50 rounded-2xl border border-white/5 text-sm text-white focus:border-primary-500 outline-none transition-all shadow-inner" placeholder="••••••••" />
+                        <input type="password" required minLength={6} value={newUserPassword} onChange={e => setNewUserPassword(e.target.value)} className="w-full px-6 py-4 bg-black/50 rounded-2xl border border-white/5 text-sm text-white focus:border-primary-500 outline-none transition-all shadow-inner" placeholder="Min. 6 caracteres" />
                     </div>
-                    <div className="flex gap-5 pt-10">
-                        <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-5 text-[11px] font-black uppercase tracking-widest text-slate-500 hover:text-white transition-all bg-white/5 rounded-2xl">Abort</button>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Tipo de Acesso</label>
+                        <div className="flex gap-3">
+                            {(['user', 'admin'] as const).map(role => (
+                                <button
+                                    key={role}
+                                    type="button"
+                                    onClick={() => setNewUserRole(role)}
+                                    className={`flex-1 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all
+                                        ${newUserRole === role ? 'bg-primary-600 text-white border-primary-500' : 'bg-black/50 text-slate-500 border-white/5 hover:border-primary-500/50 hover:text-slate-300'}`}
+                                >
+                                    {role === 'user' ? '👤 Usuário' : '🔐 Admin'}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    {modalError && (
+                        <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-5 py-3 text-red-400 text-xs font-bold">{modalError}</div>
+                    )}
+                    <div className="flex gap-5 pt-6">
+                        <button type="button" onClick={() => { setShowAddModal(false); setModalError(''); setNewUserRole('user'); }} className="flex-1 py-5 text-[11px] font-black uppercase tracking-widest text-slate-500 hover:text-white transition-all bg-white/5 rounded-2xl">Abort</button>
                         <button type="submit" className="flex-1 py-5 bg-primary-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-glow">Authorize Access</button>
                     </div>
                  </form>

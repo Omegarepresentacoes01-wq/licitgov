@@ -11,6 +11,7 @@ interface SidebarProps {
   currentUser: User | null;
   onLogout: () => void;
   onAdminClick: () => void;
+  onHistoryClick: () => void;
   isOpen?: boolean;
   onClose?: () => void;
 }
@@ -58,15 +59,16 @@ const Icons = {
   ),
 };
 
-export const Sidebar: React.FC<SidebarProps> = ({ 
-  selectedDoc, 
-  onSelect, 
-  isGenerating, 
-  darkMode, 
-  toggleDarkMode, 
-  currentUser, 
-  onLogout, 
+export const Sidebar: React.FC<SidebarProps> = ({
+  selectedDoc,
+  onSelect,
+  isGenerating,
+  darkMode,
+  toggleDarkMode,
+  currentUser,
+  onLogout,
   onAdminClick,
+  onHistoryClick,
   isOpen = false,
   onClose
 }) => {
@@ -169,16 +171,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
 
                 {currentUser.role === 'admin' && (
-                    <button 
-                        onClick={() => {
-                          onAdminClick();
-                          onClose?.();
-                        }}
-                        className="w-full mb-3 py-2.5 bg-navy-800 hover:bg-navy-700 text-slate-300 hover:text-white text-xs font-bold rounded-lg border border-white/5 transition-all uppercase tracking-wide hover:shadow-md"
+                    <button
+                        onClick={() => { onAdminClick(); onClose?.(); }}
+                        className="w-full mb-2 py-2.5 bg-navy-800 hover:bg-navy-700 text-slate-300 hover:text-white text-xs font-bold rounded-lg border border-white/5 transition-all uppercase tracking-wide hover:shadow-md"
                     >
                         Admin Control Center
                     </button>
                 )}
+                <button
+                    onClick={() => { onHistoryClick(); onClose?.(); }}
+                    className="w-full mb-3 py-2.5 bg-navy-800 hover:bg-navy-700 text-slate-300 hover:text-white text-xs font-bold rounded-lg border border-white/5 transition-all uppercase tracking-wide hover:shadow-md flex items-center justify-center gap-2"
+                >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Meus Documentos
+                </button>
                 
                 <button 
                   onClick={toggleDarkMode} 
