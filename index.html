@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LicitGov AI | Inteligência em Licitações</title>
+    <title>LicitGov AI | Plataforma de Licitações Públicas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -11,18 +11,18 @@
         theme: {
           extend: {
             fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-              serif: ['Merriweather', 'serif'],
+              sans: ['Inter', 'system-ui', 'sans-serif'],
+              serif: ['Merriweather', 'Georgia', 'serif'],
+              mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
             },
             colors: {
-              // Enterprise SaaS Palette (NextTech Style)
               primary: {
-                50: '#fff7ed',
+                50:  '#fff7ed',
                 100: '#ffedd5',
                 200: '#fed7aa',
                 300: '#fdba74',
                 400: '#fb923c',
-                500: '#f97316', // Laranja Vibrante (Vivid Orange)
+                500: '#f97316',
                 600: '#ea580c',
                 700: '#c2410c',
                 800: '#9a3412',
@@ -30,74 +30,123 @@
                 950: '#431407',
               },
               navy: {
+                50:  '#f8fafc',
+                100: '#f1f5f9',
+                200: '#e2e8f0',
+                300: '#cbd5e1',
                 500: '#64748b',
                 600: '#475569',
                 700: '#334155',
-                800: '#1e293b', // Lighter than previous
-                900: '#0f172a', // Slate 900 (Rich Blue-Grey) instead of Black
-                950: '#020617', 
-                brand: '#0f172a', // Background principal (lighter than before)
-                surface: '#1e293b' // Card background (lighter)
+                800: '#1e293b',
+                900: '#1e293b',
+                950: '#0f172a',
+                surface: '#1e293b',
               },
-              slate: {
-                850: '#1e293b',
-                900: '#0f172a',
-              },
-              dark: {
-                bg: '#0f172a',
-                card: '#1e293b'
-              }
             },
             boxShadow: {
-              'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-              'glow': '0 0 20px rgba(249, 115, 22, 0.20)',
-              'card': '0 0 0 1px rgba(255, 255, 255, 0.08), 0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+              'soft':   '0 1px 3px 0 rgba(0,0,0,.08), 0 1px 2px -1px rgba(0,0,0,.06)',
+              'card':   '0 4px 6px -1px rgba(0,0,0,.07), 0 2px 4px -2px rgba(0,0,0,.05)',
+              'modal':  '0 20px 25px -5px rgba(0,0,0,.12), 0 8px 10px -6px rgba(0,0,0,.08)',
+              'glow':   '0 0 0 3px rgba(59,130,246,.25)',
+              'inset':  'inset 0 1px 2px rgba(0,0,0,.06)',
             },
             animation: {
-              'fadeIn': 'fadeIn 0.5s ease-out forwards',
+              'fadeIn':    'fadeIn 0.3s ease-out forwards',
+              'slideDown': 'slideDown 0.2s ease-out forwards',
+              'pulse-slow':'pulse 2s cubic-bezier(0.4,0,0.6,1) infinite',
             },
             keyframes: {
               fadeIn: {
-                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '0%':   { opacity: '0', transform: 'translateY(8px)' },
                 '100%': { opacity: '1', transform: 'translateY(0)' },
-              }
-            }
+              },
+              slideDown: {
+                '0%':   { opacity: '0', transform: 'translateY(-4px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+            },
           }
         }
       }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400&display=swap" rel="stylesheet">
     <style>
-      body {
-        font-family: 'Inter', sans-serif;
-      }
-      
-      .bg-grid {
-        background-size: 40px 40px;
-        background-image: linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
-                          linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
-      }
-      .dark .bg-grid {
-        background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                          linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      }
+      *, *::before, *::after { box-sizing: border-box; }
 
-      ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+      body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; font-weight: 600; }
+      p, span, label, input, textarea, select, button, a, li, td, th { font-weight: 600; }
+
+      /* ── Scrollbar ────────────────────────────────── */
+      ::-webkit-scrollbar { width: 5px; height: 5px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+      ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+      /* ── Sidebar nav item ─────────────────────────── */
+      .nav-item {
+        display: flex; align-items: center; gap: 10px;
+        padding: 9px 12px; border-radius: 8px;
+        font-size: 13.5px; font-weight: 700; cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+        color: #475569; border: 2px solid transparent;
+        width: 100%; text-align: left;
       }
-      ::-webkit-scrollbar-track {
-        background: transparent; 
+      .nav-item:hover { background: #f1f5f9; color: #1e293b; }
+      .nav-item.active {
+        background: #fff7ed;
+        color: #c2410c;
+        border-color: #fed7aa;
       }
-      ::-webkit-scrollbar-thumb {
-        background: #94a3b8; 
-        border-radius: 4px;
+      .nav-item.active svg { color: #ea580c; }
+
+      /* ── Form field ───────────────────────────────── */
+      .field {
+        width: 100%;
+        padding: 10px 14px;
+        border: 2px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #0f172a;
+        background: #fff;
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+        font-weight: 500;
       }
-      .dark ::-webkit-scrollbar-thumb {
-        background: #475569; 
+      .field:focus { border-color: #f97316; box-shadow: 0 0 0 3px rgba(249,115,22,.12); }
+      .field::placeholder { color: #94a3b8; font-weight: 400; }
+
+      /* ── Step pill ────────────────────────────────── */
+      .step-pill {
+        display: flex; align-items: center; justify-content: center;
+        width: 26px; height: 26px; border-radius: 50%;
+        font-size: 11px; font-weight: 700;
+        border: 2px solid #e2e8f0; color: #94a3b8;
+        background: #fff; flex-shrink: 0;
+        transition: all 0.2s;
       }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #cbd5e1; 
+      .step-pill.active { border-color: #3b82f6; color: #2563eb; background: #eff6ff; }
+      .step-pill.done   { border-color: #22c55e; color: #fff; background: #22c55e; }
+
+      /* ── Prose doc styles ─────────────────────────── */
+      .doc-prose h1 { font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem; color: #0f172a; }
+      .doc-prose h2 { font-size: 1.05rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.4rem; color: #1e293b; }
+      .doc-prose h3 { font-size: .95rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.3rem; color: #334155; }
+      .doc-prose p  { font-size: 0.9rem; line-height: 1.8; color: #334155; margin-bottom: 0.75rem; }
+      .doc-prose ul, .doc-prose ol { padding-left: 1.25rem; margin-bottom: 0.75rem; }
+      .doc-prose li { font-size: 0.875rem; line-height: 1.75; color: #475569; }
+      .doc-prose table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 1rem 0; }
+      .doc-prose th { background: #f1f5f9; font-weight: 700; padding: 8px 12px; text-align: left; border: 1px solid #e2e8f0; }
+      .doc-prose td { padding: 7px 12px; border: 1px solid #e2e8f0; color: #334155; }
+      .doc-prose tr:nth-child(even) td { background: #f8fafc; }
+      .doc-prose strong { font-weight: 700; color: #0f172a; }
+      .doc-prose blockquote { border-left: 3px solid #3b82f6; padding-left: 12px; color: #64748b; font-style: italic; }
+      .doc-prose hr { border: none; border-top: 1px solid #e2e8f0; margin: 1.5rem 0; }
+
+      /* ── Badge ────────────────────────────────────── */
+      .badge {
+        display: inline-flex; align-items: center;
+        padding: 2px 8px; border-radius: 99px;
+        font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
       }
     </style>
   <script type="importmap">
@@ -111,7 +160,7 @@
 }
 </script>
 </head>
-  <body class="bg-slate-50 dark:bg-dark-bg text-slate-900 dark:text-slate-100 h-screen overflow-hidden transition-colors duration-300">
+  <body class="bg-gray-50 text-slate-900 h-screen overflow-hidden">
     <div id="root" class="h-full"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

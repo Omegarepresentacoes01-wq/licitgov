@@ -1,202 +1,226 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { DocumentType, User } from '../types';
+import { AI_MODELS, AIModel } from '../constants';
 
 interface SidebarProps {
   selectedDoc: DocumentType;
   onSelect: (doc: DocumentType) => void;
   isGenerating: boolean;
-  darkMode: boolean;
-  toggleDarkMode: () => void;
   currentUser: User | null;
   onLogout: () => void;
-  onAdminClick: () => void;
   onHistoryClick: () => void;
+  selectedModel: string;
+  onModelChange: (modelId: string) => void;
   isOpen?: boolean;
   onClose?: () => void;
 }
 
-const Icons = {
+const DocIcons: Record<DocumentType, React.ReactNode> = {
   [DocumentType.DFD]: (
-    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
     </svg>
   ),
   [DocumentType.ETP]: (
-    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+    <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
     </svg>
   ),
   [DocumentType.MAPA_RISCO]: (
-    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+    <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
     </svg>
   ),
   [DocumentType.TR]: (
-    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+    <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
     </svg>
   ),
   [DocumentType.PESQUISA_PRECO]: (
-    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+    <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
     </svg>
   ),
   [DocumentType.VIABILIDADE]: (
-    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+    <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
   ),
   [DocumentType.IMPUGNACAO]: (
-    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
-    </svg>
-  ),
-  [DocumentType.ADESAO_ATA]: (
-    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
     </svg>
   ),
 };
 
+const ModelSelector: React.FC<{ selected: string; onChange: (id: string) => void; disabled: boolean }> = ({
+  selected, onChange, disabled,
+}) => {
+  const [open, setOpen] = useState(false);
+  const current = AI_MODELS.find(m => m.id === selected) ?? AI_MODELS[0];
+
+  return (
+    <div className="px-3 py-3 border-b-2 border-white/10 relative">
+      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Motor de IA</p>
+      <button
+        onClick={() => !disabled && setOpen(o => !o)}
+        disabled={disabled}
+        className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl border-2 text-left transition-all
+          ${disabled ? 'opacity-40 cursor-not-allowed' : 'hover:border-primary-500 hover:bg-white/5 cursor-pointer'}
+          bg-white/5 border-white/15`}
+      >
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[13px] font-bold text-white truncate">{current.label}</span>
+            {current.badge && (
+              <span className="text-[9px] font-black bg-primary-500/20 text-primary-400 border border-primary-500/40 px-1.5 py-0.5 rounded-full">{current.badge}</span>
+            )}
+          </div>
+        </div>
+        <svg className={`w-4 h-4 text-slate-400 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute left-3 right-3 mt-1 z-20 bg-navy-800 border-2 border-white/15 rounded-xl shadow-2xl overflow-hidden" style={{background:'#1e293b'}}>
+            <div className="max-h-[60vh] overflow-y-auto divide-y divide-white/8">
+              {AI_MODELS.map((model, i) => (
+                <button
+                  key={model.id}
+                  onClick={() => { onChange(model.id); setOpen(false); }}
+                  className={`w-full flex items-start gap-3 px-3.5 py-3 text-left transition-colors hover:bg-white/8
+                    ${model.id === selected ? 'bg-primary-500/10 border-l-2 border-primary-500' : ''}`}
+                >
+                  <span className="text-[10px] font-black text-slate-500 w-4 shrink-0 mt-0.5">{i + 1}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[13px] font-bold text-white">{model.label}</span>
+                      {model.badge && (
+                        <span className="text-[9px] font-black bg-primary-500/20 text-primary-400 border border-primary-500/40 px-1.5 py-0.5 rounded-full">{model.badge}</span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-400 mt-0.5 leading-snug font-semibold">{model.desc}</p>
+                  </div>
+                  {model.id === selected && (
+                    <svg className="w-4 h-4 text-primary-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
 export const Sidebar: React.FC<SidebarProps> = ({
-  selectedDoc,
-  onSelect,
-  isGenerating,
-  darkMode,
-  toggleDarkMode,
-  currentUser,
-  onLogout,
-  onAdminClick,
-  onHistoryClick,
-  isOpen = false,
-  onClose
+  selectedDoc, onSelect, isGenerating,
+  currentUser, onLogout, onHistoryClick, selectedModel, onModelChange,
+  isOpen = false, onClose,
 }) => {
   return (
     <>
-      <div 
-        className={`fixed inset-0 bg-navy-950/90 z-40 lg:hidden backdrop-blur-sm transition-opacity duration-300 ${
-          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`}
+      <div
+        className={`fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm transition-opacity duration-300
+          ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
         onClick={onClose}
-        aria-hidden="true"
       />
 
-      <aside className={`
-        fixed lg:static inset-y-0 left-0 z-50
-        w-[280px] bg-navy-900 border-r border-white/5
-        flex flex-col h-full shrink-0 
-        transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none
-        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}>
-        <div className="h-20 flex items-center justify-between px-6 border-b border-white/5 bg-navy-900 shrink-0">
-          <div>
-            <h1 className="font-sans font-extrabold text-2xl text-white tracking-tight">
-              LicitGov<span className="text-primary-500">.</span>
-            </h1>
-            <div className="flex items-center gap-2 mt-0.5">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  AI Matrix
-                </p>
-                <span className="bg-primary-500/10 text-primary-500 border border-primary-500/30 text-[8px] px-1.5 py-0.5 rounded-full font-black uppercase tracking-tighter">Pro Core</span>
+      <aside
+        className={`
+          fixed lg:static inset-y-0 left-0 z-50
+          w-64 flex flex-col h-full shrink-0
+          border-r-2 border-white/10
+          transition-transform duration-300 ease-in-out
+          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
+        style={{ background: '#1e293b' }}
+      >
+        {/* Logo */}
+        <div className="h-14 flex items-center justify-between px-4 border-b-2 border-white/10 shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center shadow-lg">
+              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+            </div>
+            <div>
+              <p className="text-[15px] font-black text-white tracking-tight leading-none">LicitGov AI</p>
+              <p className="text-[10px] font-bold text-slate-400 mt-0.5 uppercase tracking-wider">Plataforma Gov</p>
             </div>
           </div>
-          
-          <button 
-            onClick={onClose} 
-            className="lg:hidden p-1 text-slate-400 hover:text-white transition-colors rounded hover:bg-white/10"
-          >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <button onClick={onClose} className="lg:hidden p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded transition-colors">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto py-8 px-4 space-y-2">
-          <div className="px-2 mb-4">
-            <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Documentos de Elite</h3>
-          </div>
-          
+        {/* Model selector */}
+        <ModelSelector selected={selectedModel} onChange={onModelChange} disabled={isGenerating} />
+
+        {/* Navigation */}
+        <div className="flex-1 overflow-y-auto py-3 px-3 space-y-1">
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2 mb-3 mt-1">Documentos</p>
           {Object.values(DocumentType).map((doc) => {
-            const isSelected = selectedDoc === doc;
+            const isActive = selectedDoc === doc;
             return (
               <button
                 key={doc}
-                onClick={() => {
-                  if (!isGenerating) {
-                    onSelect(doc);
-                    onClose?.();
-                  }
-                }}
+                onClick={() => { if (!isGenerating) { onSelect(doc); onClose?.(); } }}
                 disabled={isGenerating}
-                className={`w-full group flex items-center justify-between px-4 py-3.5 rounded-lg transition-all duration-200 text-sm font-medium border border-transparent
-                  ${isSelected 
-                    ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/20' 
-                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border-2 text-[13px] font-black transition-all
+                  ${isActive
+                    ? 'bg-primary-500 border-primary-400 text-white shadow-lg shadow-primary-500/30'
+                    : 'bg-primary-500/10 border-primary-500/30 text-primary-300 hover:bg-primary-500/20 hover:border-primary-500/50 hover:text-white'
                   }
-                  ${isGenerating ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-                `}
+                  ${isGenerating ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
               >
-                <div className="flex items-center gap-3">
-                  <span className={`${isSelected ? 'text-white' : 'text-slate-500 group-hover:text-primary-500 transition-colors'}`}>
-                    {Icons[doc]}
-                  </span>
-                  <span className="truncate tracking-tight">{doc.split(' (')[0]}</span>
-                </div>
+                <span className={isActive ? 'text-white' : 'text-primary-400'}>
+                  {DocIcons[doc]}
+                </span>
+                {doc.split(' (')[0]}
               </button>
             );
           })}
         </div>
 
+        {/* Bottom */}
         {currentUser && (
-            <div className="p-4 bg-navy-900 border-t border-white/5 shrink-0">
-                <div className="flex items-center gap-3 mb-4 p-3 rounded-xl bg-white/5 border border-white/5 group hover:border-white/10 transition-colors">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
-                        {currentUser.name.charAt(0)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-white truncate leading-tight group-hover:text-primary-400 transition-colors">{currentUser.name}</p>
-                        <p className="text-xs text-slate-500 truncate mt-0.5">Gov Auditor</p>
-                    </div>
-                    
-                    <button 
-                         onClick={onLogout}
-                         className="text-slate-500 hover:text-red-400 transition-colors p-1.5 hover:bg-white/5 rounded"
-                         title="Sair"
-                    >
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                    </button>
-                </div>
+          <div className="shrink-0 border-t-2 border-white/10 p-3 space-y-1" style={{ background: 'rgba(0,0,0,0.2)' }}>
+            <button
+              onClick={() => { onHistoryClick(); onClose?.(); }}
+              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl border-2 border-transparent text-slate-300 hover:text-white hover:bg-white/8 hover:border-white/10 transition-all text-[13px] font-bold"
+            >
+              <svg className="w-4 h-4 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Meus Documentos
+            </button>
 
-                {currentUser.role === 'admin' && (
-                    <button
-                        onClick={() => { onAdminClick(); onClose?.(); }}
-                        className="w-full mb-2 py-2.5 bg-navy-800 hover:bg-navy-700 text-slate-300 hover:text-white text-xs font-bold rounded-lg border border-white/5 transition-all uppercase tracking-wide hover:shadow-md"
-                    >
-                        Admin Control Center
-                    </button>
-                )}
-                <button
-                    onClick={() => { onHistoryClick(); onClose?.(); }}
-                    className="w-full mb-3 py-2.5 bg-navy-800 hover:bg-navy-700 text-slate-300 hover:text-white text-xs font-bold rounded-lg border border-white/5 transition-all uppercase tracking-wide hover:shadow-md flex items-center justify-center gap-2"
-                >
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    Meus Documentos
-                </button>
-                
-                <button 
-                  onClick={toggleDarkMode} 
-                  className="w-full flex items-center justify-center gap-2 text-xs font-semibold text-slate-500 hover:text-primary-400 transition-colors py-2 rounded"
-                >
-                    {darkMode ? (
-                        <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg> Light Mode</>
-                    ) : (
-                        <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg> Dark Mode</>
-                    )}
-                </button>
+            <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border-2 border-white/10 bg-white/5 mt-1">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white text-sm font-black shrink-0">
+                {currentUser.name.charAt(0).toUpperCase()}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-bold text-white truncate leading-tight">{currentUser.name}</p>
+                <p className="text-[11px] font-semibold text-slate-400 truncate">
+                  {currentUser.role === 'admin' ? 'Administrador' : 'Gestor Público'}
+                </p>
+              </div>
+              <button onClick={onLogout} title="Sair" className="text-slate-500 hover:text-red-400 transition-colors p-1 rounded hover:bg-white/5 shrink-0">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+              </button>
             </div>
+          </div>
         )}
       </aside>
     </>
