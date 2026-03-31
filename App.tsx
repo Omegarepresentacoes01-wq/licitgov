@@ -33,8 +33,8 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   render(): React.ReactNode {
     if ((this.state as ErrorBoundaryState).hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-navy-900 p-4 text-white">
-          <div className="bg-navy-surface p-8 rounded-2xl border border-red-900/30 max-w-lg w-full text-center">
+        <div className="min-h-screen flex items-center justify-center p-4 text-white" style={{ background: 'var(--bg-app)' }}>
+          <div className="p-8 rounded-2xl border border-red-900/30 max-w-lg w-full text-center" style={{ background: 'var(--bg-surface)' }}>
             <h1 className="text-2xl font-bold mb-4">Erro Crítico</h1>
             <p className="text-slate-400 mb-6">{(this.state as ErrorBoundaryState).error?.message}</p>
             <button onClick={() => window.location.reload()} className="bg-primary-600 px-6 py-3 rounded-xl font-bold">Recarregar App</button>
@@ -55,6 +55,10 @@ const App: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedModel, setSelectedModel] = useState(AI_MODELS[0].id);
   const [isCloneMode, setIsCloneMode] = useState(false);
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    const saved = localStorage.getItem('licitgov-theme');
+    return saved ? saved === 'dark' : true;
+  });
 
   const [formData, setFormData] = useState<FormData>({
     organName: '',
@@ -84,6 +88,18 @@ const App: React.FC = () => {
       setView('app');
     }
   }, []);
+
+  useEffect(() => {
+    const html = document.documentElement;
+    if (isDark) {
+      html.classList.remove('light');
+    } else {
+      html.classList.add('light');
+    }
+    localStorage.setItem('licitgov-theme', isDark ? 'dark' : 'light');
+  }, [isDark]);
+
+  const toggleTheme = () => setIsDark(d => !d);
 
   const handleGenerate = useCallback(async () => {
     if (!formData.objectDescription) {
@@ -131,10 +147,10 @@ const App: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <div className="flex h-screen w-full overflow-hidden" style={{ background: '#0f172a' }}>
+      <div className="flex h-screen w-full overflow-hidden" style={{ background: 'var(--bg-app)' }}>
         <Sidebar
           selectedDoc={selectedDoc}
-          onSelect={(doc) => { setSelectedDoc(doc); setOutputContent(''); setGenState({isGenerating: false, error: null}); }}
+          onSelect={(doc) => { setSelectedDoc(doc); setOutputContent(''); setGenState({isGenerating: false, error: null}); setIsCloneMode(false); }}
           isGenerating={genState.isGenerating}
           currentUser={currentUser}
           onLogout={() => { logout(); setCurrentUser(null); setView('login'); }}
@@ -143,12 +159,16 @@ const App: React.FC = () => {
           onModelChange={setSelectedModel}
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
+          isDark={isDark}
+          onToggleTheme={toggleTheme}
+          isCloneMode={isCloneMode}
+          onCloneModeChange={(v) => { setIsCloneMode(v); setOutputContent(''); setGenState({isGenerating: false, error: null}); }}
         />
 
         <main className="flex-1 flex flex-col h-full overflow-hidden">
 
           {/* Top bar */}
-          <header className="h-14 px-6 flex items-center justify-between shrink-0 border-b-2 border-white/10" style={{ background: '#1e293b' }}>
+          <header className="h-14 px-6 flex items-center justify-between shrink-0 border-b-2 border-white/10" style={{ background: 'var(--bg-surface)' }}>
             <div className="flex items-center gap-3">
               <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-1.5 rounded-md hover:bg-white/10 text-slate-300">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 6h16M4 12h16M4 18h16" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -156,23 +176,8 @@ const App: React.FC = () => {
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-slate-400 font-bold">LicitGov</span>
                 <svg className="w-3.5 h-3.5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
-                <span className="font-black text-white">{selectedDoc.split(' (')[0]}</span>
+                <span className="font-black text-white">{isCloneMode ? 'Clonar Documento' : selectedDoc.split(' (')[0]}</span>
               </div>
-            </div>
-
-            <div className="flex items-center gap-2 bg-white/5 border-2 border-white/10 rounded-xl p-1">
-              <button
-                onClick={() => setIsCloneMode(false)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${!isCloneMode ? 'bg-primary-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
-              >
-                Gerar Documento
-              </button>
-              <button
-                onClick={() => setIsCloneMode(true)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all ${isCloneMode ? 'bg-primary-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
-              >
-                Clonar Documento
-              </button>
             </div>
 
             <div className="flex items-center gap-3">

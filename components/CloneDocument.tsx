@@ -297,7 +297,7 @@ export const CloneDocument: React.FC<CloneDocumentProps> = ({
   };
 
   return (
-    <div className="rounded-2xl border-2 border-white/10 h-full flex flex-col overflow-hidden" style={{ background: '#1e293b' }}>
+    <div className="rounded-2xl border-2 border-white/10 h-full flex flex-col overflow-hidden" style={{ background: 'var(--bg-surface)' }}>
 
       {/* Header */}
       <div className="px-5 py-4 border-b-2 border-white/10 shrink-0">

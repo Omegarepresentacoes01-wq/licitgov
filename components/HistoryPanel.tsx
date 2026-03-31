@@ -18,10 +18,10 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({ currentUser, onBack,
   }, [currentUser.id]);
 
   return (
-    <div className="flex h-screen w-full overflow-hidden" style={{ background: '#0f172a' }}>
+    <div className="flex h-screen w-full overflow-hidden" style={{ background: 'var(--bg-app)' }}>
 
       {/* Sidebar lista */}
-      <aside className="w-[320px] flex flex-col h-full shrink-0 border-r-2 border-white/10" style={{ background: '#1e293b' }}>
+      <aside className="w-[320px] flex flex-col h-full shrink-0 border-r-2 border-white/10" style={{ background: 'var(--bg-surface)' }}>
         <div className="h-14 px-4 border-b-2 border-white/10 flex items-center gap-3 shrink-0">
           <button onClick={onBack} className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
@@ -35,7 +35,7 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({ currentUser, onBack,
         <div className="flex-1 overflow-y-auto divide-y divide-white/8">
           {docs.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full py-16 px-6 text-center">
-              <div className="w-12 h-12 rounded-xl border-2 border-white/10 flex items-center justify-center mb-3" style={{ background: '#0f172a' }}>
+              <div className="w-12 h-12 rounded-xl border-2 border-white/10 flex items-center justify-center mb-3" style={{ background: 'var(--bg-app)' }}>
                 <svg className="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
               </div>
               <p className="text-[13px] font-bold text-slate-400">Nenhum documento ainda</p>
@@ -66,7 +66,7 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({ currentUser, onBack,
       <main className="flex-1 flex flex-col h-full overflow-hidden">
         {selected ? (
           <>
-            <div className="h-14 px-6 border-b-2 border-white/10 flex justify-between items-center shrink-0" style={{ background: '#1e293b' }}>
+            <div className="h-14 px-6 border-b-2 border-white/10 flex justify-between items-center shrink-0" style={{ background: 'var(--bg-surface)' }}>
               <div>
                 <h3 className="font-black text-white text-[14px]">{selected.title}</h3>
                 <p className="text-[11px] font-bold text-slate-400 mt-0.5">{new Date(selected.createdAt).toLocaleString('pt-BR')}</p>
@@ -79,7 +79,7 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({ currentUser, onBack,
                 Abrir no Editor
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto py-8 px-6" style={{ background: '#0f172a' }}>
+            <div className="flex-1 overflow-y-auto py-8 px-6" style={{ background: 'var(--bg-app)' }}>
               <div className="max-w-[780px] mx-auto rounded-sm overflow-hidden shadow-2xl">
                 <div className="border-b-4 border-primary-500 px-10 py-4 bg-white">
                   <div className="flex items-center justify-between">
@@ -99,7 +99,7 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({ currentUser, onBack,
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <div className="w-16 h-16 rounded-2xl border-2 border-white/10 flex items-center justify-center mx-auto mb-4" style={{ background: '#1e293b' }}>
+              <div className="w-16 h-16 rounded-2xl border-2 border-white/10 flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--bg-surface)' }}>
                 <svg className="w-8 h-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5"/></svg>
               </div>
               <p className="text-[13px] font-bold text-slate-400">Selecione um documento para visualizar</p>

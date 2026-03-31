@@ -29,9 +29,9 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({
   /* ── Empty state ────────────────────────────────── */
   if (!content && !isGenerating) {
     return (
-      <div className="h-full flex flex-col items-center justify-center rounded-xl border-2 border-white/12 animate-fadeIn" style={{ background: '#1e293b' }}>
+      <div className="h-full flex flex-col items-center justify-center rounded-xl border-2 border-white/12 animate-fadeIn" style={{ background: 'var(--bg-surface)' }}>
         <div className="text-center px-8 max-w-sm">
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 border-2 border-white/10" style={{ background: '#0f172a' }}>
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 border-2 border-white/10" style={{ background: 'var(--bg-app)' }}>
             <svg className="w-8 h-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
@@ -55,7 +55,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({
 
   /* ── Document viewer ────────────────────────────── */
   return (
-    <div className="flex flex-col h-full rounded-xl overflow-hidden border-2 border-white/12" style={{ background: '#1e293b' }}>
+    <div className="flex flex-col h-full rounded-xl overflow-hidden border-2 border-white/12" style={{ background: 'var(--bg-surface)' }}>
 
       {/* Toolbar */}
       <div className="h-12 flex items-center justify-between px-4 border-b-2 border-white/10 shrink-0">
@@ -85,7 +85,7 @@ export const ResultViewer: React.FC<ResultViewerProps> = ({
       </div>
 
       {/* Paper area */}
-      <div className="flex-1 overflow-y-auto py-6 px-4" style={{ background: '#0f172a' }}>
+      <div className="flex-1 overflow-y-auto py-6 px-4" style={{ background: 'var(--bg-app)' }}>
         <div className="max-w-[780px] mx-auto rounded-sm overflow-hidden shadow-2xl">
 
           {/* Header strip */}

@@ -71,6 +71,72 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400&display=swap" rel="stylesheet">
     <style>
+      /* ── Theme variables ──────────────────────────── */
+      :root {
+        --bg-app:     #0f172a;
+        --bg-surface: #1e293b;
+        --bg-input:   #0f172a;
+        --bg-footer:  rgba(0,0,0,0.22);
+        --bg-dropdown:#1e293b;
+      }
+      :root.light {
+        --bg-app:     #f1f5f9;
+        --bg-surface: #ffffff;
+        --bg-input:   #f8fafc;
+        --bg-footer:  #f1f5f9;
+        --bg-dropdown:#ffffff;
+      }
+
+      /* ── Light mode — text overrides ─────────────── */
+      .light .text-white          { color: #0f172a !important; }
+      .light .text-slate-300      { color: #334155 !important; }
+      .light .text-slate-400      { color: #64748b !important; }
+      .light .text-slate-500      { color: #94a3b8 !important; }
+      .light .text-slate-600      { color: #94a3b8 !important; }
+      .light .text-primary-300    { color: #ea580c !important; }
+      .light .hover\:text-white:hover { color: #0f172a !important; }
+      .light .hover\:text-slate-300:hover { color: #334155 !important; }
+
+      /* ── Light mode — border overrides ───────────── */
+      .light .border-white\/8    { border-color: #e2e8f0 !important; }
+      .light .border-white\/10   { border-color: #e2e8f0 !important; }
+      .light .border-white\/12   { border-color: #e2e8f0 !important; }
+      .light .border-white\/15   { border-color: #cbd5e1 !important; }
+      .light .border-white\/20   { border-color: #cbd5e1 !important; }
+      .light .border-white\/25   { border-color: #94a3b8 !important; }
+      .light .border-white\/30   { border-color: #94a3b8 !important; }
+      .light .hover\:border-white\/20:hover { border-color: #cbd5e1 !important; }
+      .light .hover\:border-white\/30:hover { border-color: #94a3b8 !important; }
+
+      /* ── Light mode — background overrides ───────── */
+      .light .bg-white\/5         { background-color: #f8fafc !important; }
+      .light .bg-white\/8         { background-color: #f1f5f9 !important; }
+      .light .bg-white\/10        { background-color: #e8eef4 !important; }
+      .light .bg-white\/15        { background-color: #e2e8f0 !important; }
+      .light .bg-black\/60        { background-color: rgba(0,0,0,0.40) !important; }
+      .light .hover\:bg-white\/5:hover  { background-color: #f8fafc !important; }
+      .light .hover\:bg-white\/8:hover  { background-color: #f1f5f9 !important; }
+      .light .hover\:bg-white\/10:hover { background-color: #e8eef4 !important; }
+
+      /* ── Light mode — divide overrides ───────────── */
+      .light .divide-white\/8 > * + * { border-color: #e2e8f0 !important; }
+
+      /* ── Light mode — scrollbar ───────────────────── */
+      .light ::-webkit-scrollbar-thumb { background: #94a3b8; }
+
+      /* ── Light mode — inputs ─────────────────────── */
+      .light input, .light textarea, .light select {
+        color: #0f172a !important;
+      }
+      .light input::placeholder, .light textarea::placeholder {
+        color: #94a3b8 !important;
+      }
+
+      /* ── Light mode — nav-item ────────────────────── */
+      .light .nav-item         { color: #475569; }
+      .light .nav-item:hover   { background: #f1f5f9; color: #1e293b; }
+      .light .nav-item.active  { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+
       *, *::before, *::after { box-sizing: border-box; }
 
       body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; font-weight: 600; }

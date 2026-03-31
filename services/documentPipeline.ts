@@ -17,6 +17,7 @@ import { DocumentType, FormData } from '../types';
 import * as Client from './openrouterClient';
 import { getLegalContext, getSustainabilityContext } from './enrichmentSources';
 import { getDocumentConfig, SYSTEM_INSTRUCTION, ChecklistItem } from '../configs/documentConfigs';
+import { searchPNCP, formatPNCPForPrompt } from './pncpService';
 
 // ─── Tipos do pipeline ────────────────────────────────────────────────────────
 
@@ -129,41 +130,20 @@ async function enrich(
     extracted.dados_extraidos.objeto ||
     extracted.dados_extraidos.objeto_resumido ||
     objectDescription
-  )?.trim();
+  )?.trim() || objectDescription;
 
   let market = 'Dados de mercado não disponíveis. Indique "A INFORMAR" nos campos de preço e realize pesquisa formal conforme IN SEGES/ME 65/2021.';
 
-  if (objeto && objeto.length > 10) {
-    try {
-      const priceResponse = await Client.call({
-        prompt: `Você é assistente de pesquisa de preços para licitações públicas brasileiras.
+  if (!objeto || objeto.length < 5) return { legal, market, sustainability };
 
-## OBJETO:
-${objeto}
-
-## TAREFA:
-Com base no seu conhecimento de contratos públicos brasileiros registrados no
-Painel de Preços gov.br e PNCP, forneça uma faixa de referência de preços.
-
-## REGRAS:
-- Se não houver dados confiáveis: escreva "Preço de referência não localizado — necessária pesquisa formal conforme IN SEGES 65/2021"
-- NUNCA invente valores sem base
-- Indique grau de confiança: alto / médio / baixo
-
-## FORMATO:
-Preço mínimo: R$ ___
-Preço máximo: R$ ___
-Preço médio:  R$ ___
-Confiança: ___
-Fontes: ___`,
-        model: 'google/gemini-2.0-flash-001',
-        temperature: 0.0,
-        maxTokens: 800,
-      });
-      market = priceResponse.text;
-    } catch {
-      // Falha silenciosa — o documento continua sem dados de mercado
+  // ── Para todos os documentos: busca PNCP real ────────────────────────────
+  try {
+    const pncpResult = await searchPNCP(objeto);
+    if (pncpResult.success && pncpResult.items.length > 0) {
+      market = formatPNCPForPrompt(pncpResult, objeto);
     }
+  } catch {
+    // mantém o market padrão
   }
 
   return { legal, market, sustainability };

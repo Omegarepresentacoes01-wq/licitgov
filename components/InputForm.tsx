@@ -43,7 +43,7 @@ const OBJECT_TYPES: ObjectType[] = [
 ];
 
 const fieldCls = 'w-full px-4 py-3 rounded-xl text-[13px] font-bold text-white border-2 border-white/15 outline-none transition-all placeholder-slate-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20';
-const fieldBg = { background: '#0f172a' };
+const fieldBg = { background: 'var(--bg-input)' };
 
 const Label: React.FC<{ children: React.ReactNode; hint?: string; required?: boolean }> = ({ children, hint, required }) => (
   <div className="mb-2">
@@ -69,7 +69,6 @@ export const InputForm: React.FC<InputFormProps> = ({
   formData, onChange, onSubmit, isGenerating, selectedDoc,
 }) => {
   const [step, setStep] = useState(1);
-  const isPriceResearch = selectedDoc === DocumentType.PESQUISA_PRECO;
   const isDFD = selectedDoc === DocumentType.DFD;
 
   const set = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
@@ -79,7 +78,7 @@ export const InputForm: React.FC<InputFormProps> = ({
     if (step === 1) return !!formData.organName && !!formData.city;
     if (step === 2) return !!formData.modality && !!formData.judgmentCriteria;
     if (step === 3) return !!formData.objectDescription;
-    if (step === 4) return isPriceResearch || !!formData.justification;
+    if (step === 4) return !!formData.justification;
     if (step === 5) return !!formData.objectType;
     return false;
   };
@@ -87,14 +86,14 @@ export const InputForm: React.FC<InputFormProps> = ({
   const isLast = step === STEPS.length;
 
   return (
-    <div className="flex flex-col h-full rounded-xl overflow-hidden border-2 border-white/12" style={{ background: '#1e293b' }}>
+    <div className="flex flex-col h-full rounded-xl overflow-hidden border-2 border-white/12" style={{ background: 'var(--bg-surface)' }}>
 
       {/* ── Header ─────────────────────── */}
       <div className="px-5 pt-5 pb-4 border-b-2 border-white/10 shrink-0">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-[13px] font-black text-white uppercase tracking-widest">
-              {isPriceResearch ? 'Pesquisa de Preços' : isDFD ? 'Demanda' : 'Novo Documento'}
+              {isDFD ? 'Demanda' : 'Novo Documento'}
             </h2>
             <p className="text-[11px] font-bold text-slate-400 mt-0.5">
               Passo {step} de {STEPS.length} — {STEPS[step - 1].label}
@@ -143,7 +142,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                   <select name="modality" value={formData.modality} onChange={set}
                     className={`${fieldCls} appearance-none pr-8 cursor-pointer`} style={fieldBg}>
                     <option value="" disabled>Selecione...</option>
-                    {MODALITIES.map(m => <option key={m} style={{ background: '#1e293b' }}>{m}</option>)}
+                    {MODALITIES.map(m => <option key={m} style={{ background: 'var(--bg-input)' }}>{m}</option>)}
                   </select>
                 </SelectWrapper>
               </div>
@@ -153,7 +152,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                   <select name="judgmentCriteria" value={formData.judgmentCriteria} onChange={set}
                     className={`${fieldCls} appearance-none pr-8 cursor-pointer`} style={fieldBg}>
                     <option value="" disabled>Selecione...</option>
-                    {CRITERIA.map(c => <option key={c} style={{ background: '#1e293b' }}>{c}</option>)}
+                    {CRITERIA.map(c => <option key={c} style={{ background: 'var(--bg-input)' }}>{c}</option>)}
                   </select>
                 </SelectWrapper>
               </div>
@@ -163,11 +162,11 @@ export const InputForm: React.FC<InputFormProps> = ({
           {step === 3 && (
             <>
               <div>
-                <Label required hint={isPriceResearch ? 'Seja específico para melhorar a busca no PNCP.' : isDFD ? 'Descreva a necessidade do setor.' : 'Descreva o objeto com especificações técnicas.'}>
-                  {isPriceResearch ? 'Itens a Cotar' : isDFD ? 'Necessidade da Demanda' : 'Objeto da Licitação'}
+                <Label required hint={isDFD ? 'Descreva a necessidade do setor.' : 'Descreva o objeto com especificações técnicas.'}>
+                  {isDFD ? 'Necessidade da Demanda' : 'Objeto da Licitação'}
                 </Label>
                 <textarea name="objectDescription" value={formData.objectDescription} onChange={set} rows={6}
-                  placeholder={isPriceResearch ? 'Liste os itens e quantidades...' : isDFD ? 'Descreva a necessidade do setor...' : 'Descreva o item ou serviço com requisitos técnicos...'}
+                  placeholder={isDFD ? 'Descreva a necessidade do setor...' : 'Descreva o item ou serviço com requisitos técnicos...'}
                   className={`${fieldCls} resize-none leading-relaxed`} style={fieldBg} autoFocus />
               </div>
               <div>
@@ -184,11 +183,11 @@ export const InputForm: React.FC<InputFormProps> = ({
           {step === 4 && (
             <>
               <div>
-                <Label required={!isPriceResearch} hint={isPriceResearch ? 'Defina fontes prioritárias (Painel de Preços, PNCP).' : isDFD ? 'Como esta compra se alinha ao PCA?' : 'Fundamente a necessidade para o interesse público.'}>
-                  {isPriceResearch ? 'Parâmetros e Fontes' : isDFD ? 'Alinhamento ao PCA' : 'Justificativa da Contratação'}
+                <Label required hint={isDFD ? 'Como esta compra se alinha ao PCA?' : 'Fundamente a necessidade para o interesse público.'}>
+                  {isDFD ? 'Alinhamento ao PCA' : 'Justificativa da Contratação'}
                 </Label>
                 <textarea name="justification" value={formData.justification} onChange={set} rows={5}
-                  placeholder={isPriceResearch ? 'Ex: Priorizar Painel de Preços gov.br...' : isDFD ? 'Ex: Previsto no PCA 2025...' : 'Ex: A ausência desse serviço compromete...'}
+                  placeholder={isDFD ? 'Ex: Previsto no PCA 2025...' : 'Ex: A ausência desse serviço compromete...'}
                   className={`${fieldCls} resize-none leading-relaxed`} style={fieldBg} autoFocus />
               </div>
               <div>
@@ -208,7 +207,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                   <select name="objectType" value={formData.objectType} onChange={set}
                     className={`${fieldCls} appearance-none pr-8 cursor-pointer`} style={fieldBg}>
                     <option value="" disabled>Selecione o tipo...</option>
-                    {OBJECT_TYPES.map(t => <option key={t} style={{ background: '#1e293b' }}>{t}</option>)}
+                    {OBJECT_TYPES.map(t => <option key={t} style={{ background: 'var(--bg-input)' }}>{t}</option>)}
                   </select>
                 </SelectWrapper>
               </div>
@@ -253,7 +252,7 @@ export const InputForm: React.FC<InputFormProps> = ({
       </div>
 
       {/* ── Footer ─────────────────────── */}
-      <div className="px-5 py-4 border-t-2 border-white/10 flex gap-2.5 shrink-0" style={{ background: 'rgba(0,0,0,0.25)' }}>
+      <div className="px-5 py-4 border-t-2 border-white/10 flex gap-2.5 shrink-0" style={{ background: 'var(--bg-footer)' }}>
         <button
           onClick={() => setStep(s => s - 1)}
           disabled={step === 1 || isGenerating}
@@ -283,7 +282,7 @@ export const InputForm: React.FC<InputFormProps> = ({
                 </svg>
                 Gerando...
               </>
-            ) : isPriceResearch ? 'Pesquisar no PNCP' : 'Gerar Documento'}
+            ) : 'Gerar Documento'}
           </button>
         )}
       </div>

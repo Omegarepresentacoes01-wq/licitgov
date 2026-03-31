@@ -8,6 +8,26 @@ export default defineConfig(({ mode }) => {
       server: {
         port: 3000,
         host: '0.0.0.0',
+        proxy: {
+          '/proxy-pncp': {
+            target: 'https://pncp.gov.br',
+            changeOrigin: true,
+            rewrite: (p) => p.replace(/^\/proxy-pncp/, ''),
+            secure: false,
+          },
+          '/proxy-painel': {
+            target: 'https://paineldeprecos.planejamento.gov.br',
+            changeOrigin: true,
+            rewrite: (p) => p.replace(/^\/proxy-painel/, ''),
+            secure: false,
+          },
+          '/proxy-compras': {
+            target: 'https://compras.dados.gov.br',
+            changeOrigin: true,
+            rewrite: (p) => p.replace(/^\/proxy-compras/, ''),
+            secure: false,
+          },
+        },
       },
       plugins: [react()],
       define: {

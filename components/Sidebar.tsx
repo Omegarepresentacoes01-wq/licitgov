@@ -13,6 +13,10 @@ interface SidebarProps {
   onModelChange: (modelId: string) => void;
   isOpen?: boolean;
   onClose?: () => void;
+  isDark?: boolean;
+  onToggleTheme?: () => void;
+  isCloneMode?: boolean;
+  onCloneModeChange?: (v: boolean) => void;
 }
 
 const DocIcons: Record<DocumentType, React.ReactNode> = {
@@ -34,11 +38,6 @@ const DocIcons: Record<DocumentType, React.ReactNode> = {
   [DocumentType.TR]: (
     <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-    </svg>
-  ),
-  [DocumentType.PESQUISA_PRECO]: (
-    <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
     </svg>
   ),
   [DocumentType.VIABILIDADE]: (
@@ -85,7 +84,7 @@ const ModelSelector: React.FC<{ selected: string; onChange: (id: string) => void
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute left-3 right-3 mt-1 z-20 bg-navy-800 border-2 border-white/15 rounded-xl shadow-2xl overflow-hidden" style={{background:'#1e293b'}}>
+          <div className="absolute left-3 right-3 mt-1 z-20 bg-navy-800 border-2 border-white/15 rounded-xl shadow-2xl overflow-hidden" style={{background:'var(--bg-dropdown)'}}>
             <div className="max-h-[60vh] overflow-y-auto divide-y divide-white/8">
               {AI_MODELS.map((model, i) => (
                 <button
@@ -122,7 +121,8 @@ const ModelSelector: React.FC<{ selected: string; onChange: (id: string) => void
 export const Sidebar: React.FC<SidebarProps> = ({
   selectedDoc, onSelect, isGenerating,
   currentUser, onLogout, onHistoryClick, selectedModel, onModelChange,
-  isOpen = false, onClose,
+  isOpen = false, onClose, isDark = true, onToggleTheme,
+  isCloneMode = false, onCloneModeChange,
 }) => {
   return (
     <>
@@ -140,7 +140,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
-        style={{ background: '#1e293b' }}
+        style={{ background: 'var(--bg-surface)' }}
       >
         {/* Logo */}
         <div className="h-14 flex items-center justify-between px-4 border-b-2 border-white/10 shrink-0">
@@ -167,6 +167,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Navigation */}
         <div className="flex-1 overflow-y-auto py-3 px-3 space-y-1">
+
+          {/* Clone button */}
+          <button
+            onClick={() => { onCloneModeChange?.(!isCloneMode); onClose?.(); }}
+            disabled={isGenerating}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border-2 text-[13px] font-black transition-all mb-3
+              ${isCloneMode
+                ? 'bg-primary-500 border-primary-400 text-white shadow-lg shadow-primary-500/30'
+                : 'bg-primary-500/10 border-primary-500/30 text-primary-300 hover:bg-primary-500/20 hover:border-primary-500/50 hover:text-white'
+              }
+              ${isGenerating ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
+          >
+            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+            Clonar Documento
+          </button>
+
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2 mb-3 mt-1">Documentos</p>
           {Object.values(DocumentType).map((doc) => {
             const isActive = selectedDoc === doc;
@@ -193,16 +211,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Bottom */}
         {currentUser && (
-          <div className="shrink-0 border-t-2 border-white/10 p-3 space-y-1" style={{ background: 'rgba(0,0,0,0.2)' }}>
-            <button
-              onClick={() => { onHistoryClick(); onClose?.(); }}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl border-2 border-transparent text-slate-300 hover:text-white hover:bg-white/8 hover:border-white/10 transition-all text-[13px] font-bold"
-            >
-              <svg className="w-4 h-4 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Meus Documentos
-            </button>
+          <div className="shrink-0 border-t-2 border-white/10 p-3 space-y-1" style={{ background: 'var(--bg-footer)' }}>
+            <div className="flex gap-1.5">
+              <button
+                onClick={() => { onHistoryClick(); onClose?.(); }}
+                className="flex-1 flex items-center gap-2.5 px-3 py-2.5 rounded-xl border-2 border-transparent text-slate-300 hover:text-white hover:bg-white/8 hover:border-white/10 transition-all text-[13px] font-bold"
+              >
+                <svg className="w-4 h-4 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Meus Documentos
+              </button>
+              <button
+                onClick={onToggleTheme}
+                title={isDark ? 'Modo claro' : 'Modo escuro'}
+                className="p-2.5 rounded-xl border-2 border-white/10 hover:bg-white/8 transition-all text-slate-400 hover:text-white shrink-0"
+              >
+                {isDark ? (
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                  </svg>
+                )}
+              </button>
+            </div>
 
             <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl border-2 border-white/10 bg-white/5 mt-1">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white text-sm font-black shrink-0">

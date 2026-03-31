@@ -3,7 +3,6 @@ export enum DocumentType {
   ETP = 'ETP (Estudo Técnico Preliminar)',
   MAPA_RISCO = 'Mapa de Risco',
   TR = 'Termo de Referência',
-  PESQUISA_PRECO = 'Pesquisa de Preço',
   VIABILIDADE = 'Estudo de Viabilidade',
   IMPUGNACAO = 'Resposta à Impugnação',
 }
